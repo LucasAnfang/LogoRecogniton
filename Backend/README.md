@@ -1,10 +1,8 @@
 # REST-Shop
-shop REST API using Node.js and mongo
+logod etection REST API using Node.js and mongo
 
-Pull this project and 'npm install' on your machine to finish setup. 
-I am trying to teach myself some of the features of Node.js, RESTful services,
-MongoDB, and get better with javascript.
+Pull this project and 'npm install' on your machine to finish setup if you want to work on the rest api component.
 
-I am following a really good tutorial series I will link below (Would recommend). 
+image processing is done un the python section (in py) 
 
 Tutorial link: https://www.youtube.com/watch?v=0oXYLzuucwE&t=7s
