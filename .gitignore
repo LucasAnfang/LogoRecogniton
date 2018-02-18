@@ -2,3 +2,5 @@
 ENV/*
 *node_modules/*
 Backend/node-rest-api/node_modules/
+*/images/*
+*.pyc
