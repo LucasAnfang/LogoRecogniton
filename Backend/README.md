@@ -1,4 +1,4 @@
-# REST-Shop
+# Backend
 logod etection REST API using Node.js and mongo
 
 Pull this project and 'npm install' on your machine to finish setup if you want to work on the rest api component.
