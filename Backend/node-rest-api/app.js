@@ -9,21 +9,22 @@ const ordersRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
 mongoose.connect(
-    'mongodb://luke-anfang:' + process.env.MONGO_ATLAS_PW + '@node-rest-shop-shard-00-00-3cbfb.mongodb.net:27017,node-rest-shop-shard-00-01-3cbfb.mongodb.net:27017,node-rest-shop-shard-00-02-3cbfb.mongodb.net:27017/test?ssl=true&replicaSet=node-rest-shop-shard-0&authSource=admin'
+    'mongodb://logo_detection_dev:' + process.env.MONGO_ATLAS_PW + '@logo-detection-c0-shard-00-00-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-01-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-02-swlr9.mongodb.net:27017/test?ssl=true&replicaSet=logo-detection-c0-shard-0&authSource=admin'
 );
 
 app.use(morgan('dev'));
-// make the uplaod url available
+// make the upload url available
 app.use('/uploads', express.static('uploads'))
+app.use('/uploads', express.static('images'))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Avoid CORS errors
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-        'Access-Control-Allow-Headers', 
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    res.header( 
+        'Access-Control-Allow-Headers',  
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization' 
     );
     if(req.method === 'OPTIONS') {
         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET')
