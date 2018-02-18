@@ -1,3 +1,4 @@
 *.DS_Store
 ENV/*
-*/node_modules/*
+*node_modules/*
+Backend/node-rest-api/node_modules/
