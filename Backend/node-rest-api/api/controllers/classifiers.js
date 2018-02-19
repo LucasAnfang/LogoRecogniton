@@ -3,24 +3,10 @@ const mongoose = require('mongoose');
 const Order = require('../models/order');
 const Product = require('../models/product');
 const Classifier = require('../models/classifier');
-// _id: mongoose.Schema.Types.ObjectId,
-//     ownerId: { type: Number, required: true },
-//     description: { type: String, required: true },
-//     trainingsSets: [ { type: mongoose.Schema.Types.ObjectId } ],
-//     subscriberIds: [ { type: mongoose.Schema.Types.ObjectId } ],
-//     isPublic: { type: Boolean, default: false, required: true },
-//     // index for tensorflow
-//     index: { type: mongoose.Schema.Types.ObjectId, required: true },
-//     nodes: [
-//         {
-//             name: { type: String, required: true },
-//             index: { type: Number, required: true }
-//         }
-//     ]
 
 exports.fetch_all_classifiers = (req, res, next) => {
     Classifier.find()
-        .select('_id ownerId description trainingSets subscriberIds isPublic index nodes')
+        .select('_id name ownerId description trainingSets subscriberIds isPublic index nodes')
         .populate('nodes', 'name index')
         .exec() //turn it into a real promise
         .then(docs => {
@@ -30,6 +16,7 @@ exports.fetch_all_classifiers = (req, res, next) => {
                 classifiers: docs.map(doc => {
                     return {
                         _id: doc._id,
+                        name: doc.name,
                         ownerId: doc.ownerId,
                         description: doc.description,
                         trainingsSets: doc.trainingsSets,
@@ -56,22 +43,29 @@ exports.fetch_all_classifiers = (req, res, next) => {
 exports.create_classifier = (req, res, next) => {
     const classifier = new Classifier({
         _id: new mongoose.Types.ObjectId(),
+        // need to find a way to get this from the token?
         name: req.body.name,
-        price: req.body.price,
-        productImage: req.file.path
+        ownerId: req.body.ownerId,
+        description: req.body.description,
+        trainingsSets: [],
+        subscriberIds: [],
+        // need to figure out how to get these two automatically
+        index: [],
+        nodes: [],
     });
     classifier.save()
         .then(result => {
             console.log(result);
             res.status(200).json({
                 message: 'Handling POST request to /classifiers',
-                createdProduct: {
+                createdClassifier: {
                     name: result.name,
-                    price: result.price,
+                    ownerId: result.ownerId,
+                    description: req.body.description,
                     _id: result._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/products/' + result._id
+                        url: 'http://localhost:3000/classifiers/' + result._id
                     }
                 }
             });
@@ -86,9 +80,9 @@ exports.create_classifier = (req, res, next) => {
 
 exports.fetch_classifier = (req, res, next) => {
     const id = req.params.orderId;
-    Order.findById(id)
-        .select('product _id quantity')
-        .populate('product', 'price name _id')
+    Classifier.findById(id)
+        .select('name ownerId trainingsSets subscriberIds')
+        .populate('trainingSets', '')
         .exec()
         .then(order => {
             if (order) {
@@ -96,7 +90,7 @@ exports.fetch_classifier = (req, res, next) => {
                     order: order,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/orders/' //return list of orders
+                        url: 'http://localhost:3000/classifiers/' //return list of orders
                         //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
                     }
                 });
@@ -113,17 +107,17 @@ exports.fetch_classifier = (req, res, next) => {
 }
 
 exports.delete_classifier = (req, res, next) => {
-    const id = req.params.orderId;
-    Order.remove({ _id: id })
+    const id = req.params.classifierId;
+    Classifier.remove({ _id: id })
         .exec()
         .then(result => {
             console.log(result);
             res.status(200).json({
-                message: 'Order deleted',
+                message: 'Classifier deleted',
                 request: {
                     type: 'POST',
-                    url: 'http://localhost:3000/orders/',
-                    body: { productId: 'ID', quantity: 'Number' }
+                    url: 'http://localhost:3000/classifier/',
+                    body: { classifierId: 'ID' }
                 }
             });
         })
