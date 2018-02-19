@@ -1,5 +1,3 @@
-import { Mongoose } from 'mongoose';
-
 const mongoose = require('mongoose');
 
 const classifierSchema = mongoose.Schema({
@@ -7,10 +5,10 @@ const classifierSchema = mongoose.Schema({
     ownerId: { type: Number, required: true },
     description: { type: String, required: true },
     trainingsSets: [ { type: mongoose.Schema.Types.ObjectId } ],
-    subscriberIds: [ { type: mongoose.Schema.Types.objectId } ],
-    isPublic: { type: Boolean, default: false, required: true },
+    subscriberIds: [ { type: mongoose.Schema.Types.ObjectId } ],
+    isPublic: { type: Boolean, default: false },
     // index for tensorflow
-    index: { type: mongoose.Schema.Types.objectId, required: true },
+    index: { type: mongoose.Schema.Types.ObjectId, required: true },
     nodes: [
         {
             name: { type: String, required: true },

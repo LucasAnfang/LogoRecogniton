@@ -6,7 +6,8 @@ const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
-const userRoutes = require('./api/routes/user');
+const userRoutes = require('./api/routes/users');
+const classifierRoutes = require('./api/routes/classifiers');
 
 mongoose.connect(
     'mongodb://logo_detection_dev:' + process.env.MONGO_ATLAS_PW + '@logo-detection-c0-shard-00-00-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-01-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-02-swlr9.mongodb.net:27017/test?ssl=true&replicaSet=logo-detection-c0-shard-0&authSource=admin'
@@ -36,7 +37,8 @@ app.use((req, res, next) => {
 // routes that handle requests
 app.use('/products', productRoutes);
 app.use('/orders', ordersRoutes);
-app.use('/user', userRoutes);
+app.use('/users', userRoutes);
+app.use('/classifiers', classifierRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');
