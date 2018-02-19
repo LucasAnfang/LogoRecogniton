@@ -4,6 +4,34 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user')
 
+exports.fetch_all_users = (req, res, next) => {
+    User.find()
+        .select('name email')
+        .exec() //turn it into a real promise
+        .then(docs => {
+            console.log(docs);
+            res.status(200).json({
+                count: docs.length,
+                orders: docs.map(doc => {
+                    return {
+                        _id: doc._id,
+                        name: doc.name,
+                        email: doc.email,
+                        request: {
+                            type: 'GET',
+                            url: 'http://localhost:2000/users/' + doc._id
+                        }
+                    };
+                })
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+}
 exports.signup_user = (req, res, next) => {
     User.find({ email: req.body.email })
         .exec()
