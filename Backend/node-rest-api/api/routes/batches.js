@@ -6,7 +6,7 @@ const BatchController = require('../controllers/batches');
 
 router.get('/', checkAuth, BatchController.fetch_all_batches);
 
-router.post('/', checkAuth, BatchController.create_batc);
+router.post('/', checkAuth, BatchController.create_batch);
 
 router.get('/:classifierId', checkAuth, BatchController.fetch_batch);
 

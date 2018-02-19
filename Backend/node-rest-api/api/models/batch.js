@@ -7,7 +7,7 @@ const batchSchema = mongoose.Schema({
         userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
         configuration: {
             classifiers: [
-                {type: mongoose.Schema.Types.ObjectId, ref: 'Classifier'}
+                {type: mongoose.Schema.Types.ObjectId, ref: 'Batch'}
             ]
         },
         uploadTimestamp: {  type : Date, default: Date.now },
@@ -18,4 +18,4 @@ const batchSchema = mongoose.Schema({
     batchType: {type: Number, required: true}
 });
 
-module.exports = mongoose.model('Classifier', batchSchema);
+module.exports = mongoose.model('Batch', batchSchema);
