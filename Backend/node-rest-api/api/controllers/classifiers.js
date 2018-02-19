@@ -84,10 +84,10 @@ exports.fetch_classifier = (req, res, next) => {
         .select('name ownerId trainingsSets subscriberIds')
         .populate('trainingSets', '')
         .exec()
-        .then(order => {
-            if (order) {
+        .then(classifier => {
+            if (classifier) {
                 res.status(200).json({
-                    order: order,
+                    classifier: classifier,
                     request: {
                         type: 'GET',
                         url: 'http://localhost:3000/classifiers/' //return list of orders
