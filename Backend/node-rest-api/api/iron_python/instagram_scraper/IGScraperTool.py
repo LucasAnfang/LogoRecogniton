@@ -21,7 +21,7 @@ def IG_train(logo_brand, maxImages):
         <logo_brand>
         This only needs to scrape for pictures
     '''
-    destinationFolder = './images/'
+    destinationFolder = './images/' #append this with another argument, which will separate the images into folders
     args = {
         'username': [logo_brand],
         'verbose': 0,
@@ -128,6 +128,7 @@ def main():
         """),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         fromfile_prefix_chars='@')
+        
     #train
     parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
     parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
@@ -139,6 +140,10 @@ def main():
     #operate
     parser.add_argument('--operate', '-o', nargs='+', default=None, help='Input list of hashtags (in ) to scrape on with -l logo.')
     parser.add_argument('--logo', '-l', default=None, help='Logo name to operate on')
+    #organization
+    # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
+    #uid
+    # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
     args= parser.parse_args()
 
     #train call to function
@@ -148,20 +153,20 @@ def main():
     #train upload
     if(args.train_upload is not None):
         if(args.dir_logo is None or args.dir_no_logo is None):
-            print("Please provie both logo pic directory (--dir_logo) and no logo pic directory (--dir_no_logo)")
+            # print("Please provie both logo pic directory (--dir_logo) and no logo pic directory (--dir_no_logo)")
             return
         #check if dir is valid
         if not os.path.isdir(args.dir_logo) or not os.path.isdir(args.dir_no_logo):
-            print("Error: invalid directory")
+            # print("Error: invalid directory")
             return
         IG_train_upload(args.train_upload, args.dir_logo, args.dir_no_logo)
     #operate
     if args.operate is not None:
         if args.logo is None:
-            print("Please provide a logo name with operate")
+            # print("Please provide a logo name with operate")
             return
         else:
-            print(args.operate)
+            # print(args.operate)
             IG_operate(args.logo, args.operate, args.max_images)
             return
 

@@ -1,4 +1,4 @@
-var PythonShell = require('python-shell');
+const PythonShell = require('python-shell');
 
 var options = {
     // mode: 'text',
