@@ -18,7 +18,7 @@ PythonShell.run('echo_args.py', options, function (err, results) {
 
 // Original call: IGScraperTool.py -t patagonia -m 10
 options.scriptPath = './api/iron_python/instagram_scraper';
-options.args = ['-t', 'patagonia', '-m', '500'];
+options.args = ['-t', 'patagonia', '-m', '100'];
 PythonShell.run('IGScraperTool.py', options, function (err, results) {
     if (err) throw err;
     // results is an array consisting of messages collected during execution
