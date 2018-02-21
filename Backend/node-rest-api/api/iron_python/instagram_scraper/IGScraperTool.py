@@ -111,12 +111,9 @@ def IG_operate(logo_brand, hashtagList, maxImages):
             'latest': False,
             'logo_name': logo_brand
         }
-        print "before scraper"
         scraper = InstagramScraper(**args)
-        print "after scraper"
         # ipe.extend(scraper.logout())
-        print "after extend"
-    print("Operate complete")
+
     # ic.upload_brand_operational_input_IPE(logo_brand, ipe, False)
 
 def main():
@@ -130,7 +127,7 @@ def main():
         fromfile_prefix_chars='@')
     #train
     parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
-    parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
+
     #train-upload
     parser.add_argument('--train-upload', '--train_upload', '-tu', default=None, help='logo brand name to upload directory into networked file system')
     parser.add_argument('--dir_logo', '-dl', default=None, help='Directory of pictures WITH LOGO on local machine')
@@ -141,12 +138,17 @@ def main():
     parser.add_argument('--logo', '-l', default=None, help='Logo name to operate on')
 
     # NEW FOR NODE
+    parser.add_argument('--hashtag_to_images', '-hi', default=None, help='Scrape for pictures on hashtag provided')
+    parser.add_argument('--hashtag_to_post', '-hp', default=None, help='Scrape for full post (image and metadata) on hashtag provided')
     parser.add_argument('--output_directory', '-d', help='Directory to save images')
+    parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
+    parser.ad
     args= parser.parse_args()
 
-    #train call to function
-    if(args.train is not None):
-        IG_train(args.train, args.max_images, args.output_directory)
+    if(args.output_directory is None):
+        return
+    if(args.hashtag_to_images is not None):
+        IG_train(args.hashtag_to_images, args.max_images, args.output_directory)
         return
     #train upload
     if(args.train_upload is not None):
@@ -165,7 +167,7 @@ def main():
             return
         else:
             print(args.operate)
-            IG_operate(args.logo, args.operate, args.max_images)
+            IG_operate(args.logo, args.operate, args.max_images, args.output_directory)
             return
 
 if __name__ == '__main__':
