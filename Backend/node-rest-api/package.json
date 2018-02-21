@@ -1,5 +1,5 @@
 {
-  "name": "rest-shop",
+  "name": "restful-image-processing-backend",
   "version": "1.0.0",
   "description": "A Node.js RESTful API Tutorial Project (Build a simple shop API)",
   "main": "index.js",

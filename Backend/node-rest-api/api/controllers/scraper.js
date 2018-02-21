@@ -17,8 +17,9 @@ exports.fetch_images_with_hashtag = (req, res, next) => {
             if (err) throw err;
             console.log('results: %j', results);
             outputImageDirectory = outputImageDirectory + hashtag + '/';
+            outputImageDirectory = outputImageDirectory.substring(2);
             var files = fs.readdirSync(outputImageDirectory);
-            fullFilenames = files.map(filename => outputImageDirectory + filename);
+            fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory + filename);
             res.status(201).json({
                 hashtag: hashtag,
                 filePaths: fullFilenames

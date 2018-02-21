@@ -19,8 +19,8 @@ mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'));
 // make the upload url available
-app.use('/uploads', express.static('uploads'))
-app.use('/uploads', express.static('images'))
+app.use('/uploads', express.static('uploads'));
+app.use('/images', express.static('images'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
