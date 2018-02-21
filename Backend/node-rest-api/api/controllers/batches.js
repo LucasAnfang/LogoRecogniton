@@ -3,28 +3,9 @@ const mongoose = require('mongoose');
 const Order = require('../models/order');
 const Product = require('../models/product');
 const Batch = require('../models/batch');
-// const batchSchema = mongoose.Schema({
-//     _id: mongoose.Schema.Types.ObjectId,
-//     isProcessed: { type: Boolean, default: false },
-//     uploadRequest: { 
-//         userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
-//         configuration: {
-//             classifiers: [
-//                 {type: mongoose.Schema.Types.ObjectId, ref: 'Classifier'}
-//             ]
-//         },
-//         uploadTimestamp: {  type : Date, default: Date.now },
-//     },
-//     completionTimestamp: {type: Date, default: Date.now },
-//     data: [{ rowId: mongoose.Schema.Types.ObjectId}],
-//     // training/ops
-//     batchType: {type: Number, required: true}
-// });
-
 
 exports.fetch_all_batches = (req, res, next) => {
     Batches.find()
-        //mayhaps remove data
         .select('_id isProcessed uploadRequest completionTimestamp data batchType')
         .populate('uploadRequest', 'data')
         .exec() //turn it into a real promise
