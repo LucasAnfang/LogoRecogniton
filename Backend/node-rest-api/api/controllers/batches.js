@@ -23,7 +23,7 @@ exports.fetch_all_batches = (req, res, next) => {
                         batchType: doc.batchType,
                         request: {
                             type: 'GET',
-                            url: 'http://localhost:3000/batches/' + doc._id
+                            url: 'http://localhost:2000/batches/' + doc._id
                         }
                     };
                 })
@@ -60,7 +60,7 @@ exports.create_batch = (req, res, next) => {
                     _id: result._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/batches/' + result._id
+                        url: 'http://localhost:2000/batches/' + result._id
                     }
                 }
             });
@@ -86,7 +86,7 @@ exports.fetch_batch = (req, res, next) => {
                     batch: batch,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/batches/' + batch._id
+                        url: 'http://localhost:2000/batches/' + batch._id
 
                     }
                 });
@@ -112,7 +112,7 @@ exports.delete_batch = (req, res, next) => {
                 message: 'Batch deleted',
                 request: {
                     type: 'POST',
-                    url: 'http://localhost:3000/batches/',
+                    url: 'http://localhost:2000/batches/',
                     body: { productId: 'ID' }
                 }
             });

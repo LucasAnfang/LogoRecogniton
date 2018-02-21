@@ -142,7 +142,6 @@ def main():
     parser.add_argument('--hashtag_to_post', '-hp', default=None, help='Scrape for full post (image and metadata) on hashtag provided')
     parser.add_argument('--output_directory', '-d', help='Directory to save images')
     parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
-    parser.ad
     args= parser.parse_args()
 
     if(args.output_directory is None):

@@ -26,7 +26,7 @@ exports.fetch_all_classifiers = (req, res, next) => {
                         nodes: doc.nodes,
                         request: {
                             type: 'GET',
-                            url: 'http://localhost:3000/classifiers/' + doc._id
+                            url: 'http://localhost:2000/classifiers/' + doc._id
                         }
                     };
                 })
@@ -65,7 +65,7 @@ exports.create_classifier = (req, res, next) => {
                     _id: result._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/classifiers/' + result._id
+                        url: 'http://localhost:2000/classifiers/' + result._id
                     }
                 }
             });
@@ -90,7 +90,7 @@ exports.fetch_classifier = (req, res, next) => {
                     classifier: classifier,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/classifiers/' //return list of orders
+                        url: 'http://localhost:2000/classifiers/' //return list of orders
                         //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
                     }
                 });
@@ -116,7 +116,7 @@ exports.delete_classifier = (req, res, next) => {
                 message: 'Classifier deleted',
                 request: {
                     type: 'POST',
-                    url: 'http://localhost:3000/classifier/',
+                    url: 'http://localhost:2000/classifier/',
                     body: { classifierId: 'ID' }
                 }
             });
