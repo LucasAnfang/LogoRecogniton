@@ -15,7 +15,7 @@ STORAGE_ACCOUNT_NAME = 'logodetectionstorage'
 STORAGE_ACCOUNT_KEY = 'jPJyzct+8WD1lKU5M+ZwDflWUGRu+YBpH8n/3Z6qR7WD7uc3HV2U1rtiQKesLRq2tU3jtXIe26RklAYdKzoydA=='
 
 
-def IG_train(logo_brand, maxImages):
+def IG_train(logo_brand, maxImages, outDir):
     '''
         Scrapes max Images from logo_brand name and saves it to a directory named
         <logo_brand>
@@ -33,7 +33,7 @@ def IG_train(logo_brand, maxImages):
         'media_types': ['image'],
         'media_metadata': False,
         'login_only': False,
-        'destination': destinationFolder,
+        'destination': outDir,
         'maximum': maxImages,
         'filename': None,
         'filter': None,
@@ -139,11 +139,14 @@ def main():
     #operate
     parser.add_argument('--operate', '-o', nargs='+', default=None, help='Input list of hashtags (in ) to scrape on with -l logo.')
     parser.add_argument('--logo', '-l', default=None, help='Logo name to operate on')
+
+    # NEW FOR NODE
+    parser.add_argument('--output_directory', '-d', help='Directory to save images')
     args= parser.parse_args()
 
     #train call to function
     if(args.train is not None):
-        IG_train(args.train, args.max_images)
+        IG_train(args.train, args.max_images, args.output_directory)
         return
     #train upload
     if(args.train_upload is not None):
