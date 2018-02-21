@@ -3,26 +3,32 @@ const PythonShell = require('python-shell');
 const uid = require('uid'); 
 const fs = require('fs');
 
-exports.fetch_images_with_hashtags = (req, res, next) => {
-
-    for(const hashtag in req.params.hashtags) {
-        var outputImageDirectory = '../../images/' + uid() + '/';
+exports.fetch_images_with_hashtag = (req, res, next) => {
+    try {
+        console.log(req.body)
+        var hashtag = req.body.hashtag;
+        var outputImageDirectory = './images/' + uid() + '/';
         var options = {
-            scriptPath: '../iron_python/instagram_scraper',
-            args: ['-t', hashtag, '-d', outputImageDirectory, '-m', req.params.image_count]
+            scriptPath: './api/iron_python/instagram_scraper',
+            args: ['-t', hashtag, '-d', outputImageDirectory, '-m', req.body.image_count]
         };
         
         PythonShell.run('IGScraperTool.py', options, function (err, results) {
             if (err) throw err;
-            // results is an array consisting of messages collected during execution
             console.log('results: %j', results);
-        });
-        const fs = require('fs');
-
-        fs.readdir(testFolder, (err, files) => {
-            files.forEach(file => {
-                console.log(file);
+            outputImageDirectory = outputImageDirectory + hashtag + '/';
+            var files = fs.readdirSync(outputImageDirectory);
+            fullFilenames = files.map(filename => outputImageDirectory + filename);
+            res.status(500).json({
+                hashtag: hashtag,
+                filePaths: fullFilenames
             });
+        });
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({
+            error: err
         });
     }
 }
