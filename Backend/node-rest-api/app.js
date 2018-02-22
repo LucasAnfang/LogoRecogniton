@@ -12,7 +12,7 @@ const batchRoutes = require('./api/routes/batches');
 const scraperRoutes = require('./api/routes/scraper');
 
 mongoose.connect(
-    'mongodb://logo_detection_dev:' + process.env.MONGO_ATLAS_PW + '@logo-detection-c0-shard-00-00-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-01-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-02-swlr9.mongodb.net:27017/test?ssl=true&replicaSet=logo-detection-c0-shard-0&authSource=admin'
+    'mongodb://logo_detection_dev:' + process.env.MONGO_ATLAS_PW + '@logo-detection-c0-shard-00-00-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-01-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-02-swlr9.mongodb.net:27017/LogoDetection?ssl=true&replicaSet=logo-detection-c0-shard-0&authSource=admin'
 );
 
 mongoose.Promise = global.Promise;
