@@ -15,7 +15,7 @@ STORAGE_ACCOUNT_NAME = 'logodetectionstorage'
 STORAGE_ACCOUNT_KEY = 'jPJyzct+8WD1lKU5M+ZwDflWUGRu+YBpH8n/3Z6qR7WD7uc3HV2U1rtiQKesLRq2tU3jtXIe26RklAYdKzoydA=='
 
 
-def IG_train(logo_brand, maxImages):
+def IG_train(logo_brand, maxImages, outDir):
     '''
         Scrapes max Images from logo_brand name and saves it to a directory named
         <logo_brand>
@@ -33,7 +33,7 @@ def IG_train(logo_brand, maxImages):
         'media_types': ['image'],
         'media_metadata': False,
         'login_only': False,
-        'destination': destinationFolder,
+        'destination': outDir,
         'maximum': maxImages,
         'filename': None,
         'filter': None,
@@ -111,12 +111,9 @@ def IG_operate(logo_brand, hashtagList, maxImages):
             'latest': False,
             'logo_name': logo_brand
         }
-        print "before scraper"
         scraper = InstagramScraper(**args)
-        print "after scraper"
         # ipe.extend(scraper.logout())
-        print "after extend"
-    print("Operate complete")
+
     # ic.upload_brand_operational_input_IPE(logo_brand, ipe, False)
 
 def main():
@@ -131,7 +128,7 @@ def main():
         
     #train
     parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
-    parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
+
     #train-upload
     parser.add_argument('--train-upload', '--train_upload', '-tu', default=None, help='logo brand name to upload directory into networked file system')
     parser.add_argument('--dir_logo', '-dl', default=None, help='Directory of pictures WITH LOGO on local machine')
@@ -140,15 +137,25 @@ def main():
     #operate
     parser.add_argument('--operate', '-o', nargs='+', default=None, help='Input list of hashtags (in ) to scrape on with -l logo.')
     parser.add_argument('--logo', '-l', default=None, help='Logo name to operate on')
+<<<<<<< HEAD
     #organization
     # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
     #uid
     # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
+=======
+
+    # NEW FOR NODE
+    parser.add_argument('--hashtag_to_images', '-hi', default=None, help='Scrape for pictures on hashtag provided')
+    parser.add_argument('--hashtag_to_post', '-hp', default=None, help='Scrape for full post (image and metadata) on hashtag provided')
+    parser.add_argument('--output_directory', '-d', help='Directory to save images')
+    parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
+>>>>>>> 41d44e5fbf27ee99c4779c3352e86bbaff055a99
     args= parser.parse_args()
 
-    #train call to function
-    if(args.train is not None):
-        IG_train(args.train, args.max_images)
+    if(args.output_directory is None):
+        return
+    if(args.hashtag_to_images is not None):
+        IG_train(args.hashtag_to_images, args.max_images, args.output_directory)
         return
     #train upload
     if(args.train_upload is not None):
@@ -166,8 +173,13 @@ def main():
             # print("Please provide a logo name with operate")
             return
         else:
+<<<<<<< HEAD
             # print(args.operate)
             IG_operate(args.logo, args.operate, args.max_images)
+=======
+            print(args.operate)
+            IG_operate(args.logo, args.operate, args.max_images, args.output_directory)
+>>>>>>> 41d44e5fbf27ee99c4779c3352e86bbaff055a99
             return
 
 if __name__ == '__main__':

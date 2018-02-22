@@ -8,8 +8,8 @@ router.get('/', checkAuth, BatchController.fetch_all_batches);
 
 router.post('/', checkAuth, BatchController.create_batch);
 
-router.get('/:classifierId', checkAuth, BatchController.fetch_batch);
+router.get('/:batchId', checkAuth, BatchController.fetch_batch);
 
-router.delete('/:classifierId', checkAuth, BatchController.delete_batch);
+router.delete('/:batchId', checkAuth, BatchController.delete_batch);
 
 module.exports = router;

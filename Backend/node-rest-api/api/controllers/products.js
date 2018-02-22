@@ -17,7 +17,7 @@ exports.fetch_all_products = (req, res, next) => {
                         _id: doc._id,
                         request: {
                             type: 'GET',
-                            url: 'http://localhost:3000/products/' + doc._id
+                            url: 'http://localhost:2000/products/' + doc._id
                         }
                     };
                 })
@@ -52,7 +52,7 @@ exports.create_product = (req, res, next) => {
                     _id: result._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/products/' + result._id
+                        url: 'http://localhost:2000/products/' + result._id
                     }
                 }
             });
@@ -77,7 +77,7 @@ exports.fetch_product = (req, res, next) => {
                     product: doc,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/products/'
+                        url: 'http://localhost:2000/products/'
                     }
                 });
             } else {
@@ -108,7 +108,7 @@ exports.update_product = (req, res, next) => {
                 message: 'Product updated',
                 request: {
                     type: 'GET',
-                    url: 'http://localhost:3000/products/' + id
+                    url: 'http://localhost:2000/products/' + id
                 }
             });
         })
@@ -130,7 +130,7 @@ exports.delete_product = (req, res, next) => {
                 message: 'Product deleted',
                 request: {
                     type: 'POST',
-                    url: 'http://localhost:3000/products/',
+                    url: 'http://localhost:2000/products/',
                     body: { name: 'String', price: 'Number' }
                 }
             });
