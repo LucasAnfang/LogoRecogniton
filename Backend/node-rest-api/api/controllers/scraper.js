@@ -12,7 +12,6 @@ exports.fetch_images_with_hashtag = (req, res, next) => {
             scriptPath: './api/iron_python/instagram_scraper',
             args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', req.body.image_count]
         };
-        
         PythonShell.run('IGScraperTool.py', options, function (err, results) {
             if (err) throw err;
             console.log('results: %j', results);
