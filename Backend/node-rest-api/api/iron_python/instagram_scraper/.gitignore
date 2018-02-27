@@ -8,3 +8,6 @@ build
 dist
 insta_args.txt
 **/.DS_Store
+**/ENV/**
+**/env/**
+../env/*
