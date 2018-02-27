@@ -167,13 +167,8 @@ def main():
             # print("Please provide a logo name with operate")
             return
         else:
-<<<<<<< HEAD
-            # print(args.operate)
-            IG_operate(args.logo, args.operate, args.max_images)
-=======
             print(args.operate)
             IG_operate(args.logo, args.operate, args.max_images, args.output_directory)
->>>>>>> 41d44e5fbf27ee99c4779c3352e86bbaff055a99
             return
 
 if __name__ == '__main__':
