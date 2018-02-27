@@ -137,19 +137,13 @@ def main():
     #operate
     parser.add_argument('--operate', '-o', nargs='+', default=None, help='Input list of hashtags (in ) to scrape on with -l logo.')
     parser.add_argument('--logo', '-l', default=None, help='Logo name to operate on')
-<<<<<<< HEAD
-    #organization
-    # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
-    #uid
-    # parser.add_argument('--train', '-t', default=None, help='Scrape for training pictures on hashtag provided')
-=======
+
 
     # NEW FOR NODE
     parser.add_argument('--hashtag_to_images', '-hi', default=None, help='Scrape for pictures on hashtag provided')
     parser.add_argument('--hashtag_to_post', '-hp', default=None, help='Scrape for full post (image and metadata) on hashtag provided')
     parser.add_argument('--output_directory', '-d', help='Directory to save images')
     parser.add_argument('--max_images', '-m', type=int, default=500, help='Maximum number of images scraped for')
->>>>>>> 41d44e5fbf27ee99c4779c3352e86bbaff055a99
     args= parser.parse_args()
 
     if(args.output_directory is None):
