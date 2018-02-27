@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-const PythonShell = require('python-shell');
-=======
 var PythonShell = require('python-shell');
 const uid = require('uid'); 
 const fs = require('fs');
@@ -12,7 +9,6 @@ const fs = require('fs');
 //     args: ['hello', 'world'] // args: ['--buoy', '46232'] for when we want to add arges with flags
 // };
 // options.args = ['hello', 'world']
->>>>>>> 41d44e5fbf27ee99c4779c3352e86bbaff055a99
 
 
 // PythonShell.run('echo_args.py', options, function (err, results) {
