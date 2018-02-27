@@ -66,7 +66,7 @@ def IG_train_upload(logo_brand, directory, noLogoDirectory):
     # ipe.archiveImageDirectory(noLogoDirectory, has_logo = False)
     # ic.upload_brand_training_input_IPE(logo_brand, ipe, False)
     dirs = [directory, noLogoDirectory]
-    # print 'logo directory: {} || no logo directory: {} || Both {}'.format(directory,noLogoDirectory, dirs)
+    print 'logo directory: {} || no logo directory: {} || Both {}'.format(directory,noLogoDirectory, dirs)
     # ipe.archiveImageDirectoryPaths(directory, has_logo = True)
     # ipe.archiveImageDirectoryPaths(noLogoDirectory, has_logo = False)
     # ic.upload_brand_training_input_IPE_FAST(logo_brand, directory, noLogoDirectory, ipe, False)
@@ -82,7 +82,7 @@ def IG_operate(logo_brand, hashtagList, maxImages):
     '''
     # config = NFS_Controller_Config(STORAGE_ACCOUNT_NAME, STORAGE_ACCOUNT_KEY)
     # ic = InputController(config)
-    # print "max in here" + str(maxImages)
+    print "max in here" + str(maxImages)
     #saves it to director
     # ipe = InstagramPostEntities(isClassification=True)
 
@@ -167,7 +167,7 @@ def main():
             # print("Please provide a logo name with operate")
             return
         else:
-            # print(args.operate)
+            print(args.operate)
             IG_operate(args.logo, args.operate, args.max_images, args.output_directory)
             return
 
