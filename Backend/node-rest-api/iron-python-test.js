@@ -21,7 +21,7 @@ var hashtagScrapeResult = {};
 var hashtag = 'patagonia';
 hashtagScrapeResult.hashtag = hashtag;
 image_count = 100;
-var outputImageDirectory = './images/' + uid() + '/';
+var outputImageDirectory = './datasets/' + uid() + '/';
 var options = {
     scriptPath: './api/iron_python/instagram_scraper',
     args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]

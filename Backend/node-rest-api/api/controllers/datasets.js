@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
-const Batch = require('../models/batch');
+const Dataset = require('../models/dataset');
 
-exports.fetch_all_batches = (req, res, next) => {
-    Batches.find()
-        .select('_id isProcessed uploadRequest completionTimestamp data batchType')
+exports.fetch_all_datasets = (req, res, next) => {
+    Dataset.find()
+        .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
         .populate('uploadRequest', 'data')
         .exec() //turn it into a real promise
         .then(docs => {
@@ -20,10 +20,10 @@ exports.fetch_all_batches = (req, res, next) => {
                         uploadRequest: doc.uploadRequest,
                         completionTimestamp: doc.completionTimestamp,
                         data: doc.data,
-                        batchType: doc.batchType,
+                        datasetType: doc.datasetType,
                         request: {
                             type: 'GET',
-                            url: 'http://localhost:2000/batches/' + doc._id
+                            url: 'http://localhost:2000/datasets/' + doc._id
                         }
                     };
                 })
@@ -37,8 +37,39 @@ exports.fetch_all_batches = (req, res, next) => {
         });
 }
 
-exports.create_batch = (req, res, next) => {
-    const batch = new Batch({
+exports.upload_images = (req, res, next) => {
+    // const product = new Product({
+    //     _id: new mongoose.Types.ObjectId(),
+    //     name: req.body.name,
+    //     price: req.body.price,
+    //     productImage: req.file.path
+    // });
+    // product.save()
+    //     .then(result => {
+    //         console.log(result);
+    //         res.status(200).json({
+    //             message: 'Handling POST request to /products',
+    //             createdProduct: {
+    //                 name: result.name,
+    //                 price: result.price,
+    //                 _id: result._id,
+    //                 request: {
+    //                     type: 'GET',
+    //                     url: 'http://localhost:2000/products/' + result._id
+    //                 }
+    //             }
+    //         });
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         res.status(500).json({ 
+    //             error: err 
+    //         });
+    //     });
+}
+
+exports.create_dataset = (req, res, next) => {
+    const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
         //what goes in here
         uploadRequest: {
@@ -48,19 +79,19 @@ exports.create_batch = (req, res, next) => {
         data: {
 
         },
-        batchType: req.body.batchType
+        datasetType: req.body.datasetType
     });
-    batch.save()
+    dataset.save()
         .then(result => {
             console.log(result);
             res.status(200).json({
-                message: 'Handling POST request to /batches',
-                createdBatch: {
+                message: 'Handling POST request to /datasets',
+                createdDataset: {
                     name: result.name,
                     _id: result._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:2000/batches/' + result._id
+                        url: 'http://localhost:2000/datasets/' + result._id
                     }
                 }
             });
@@ -73,25 +104,25 @@ exports.create_batch = (req, res, next) => {
         });
 }
 
-exports.fetch_batch = (req, res, next) => {
+exports.fetch_dataset = (req, res, next) => {
     const id = req.params.orderId;
-    Batch.findById(id)
+    Dataset.findById(id)
         //maybe remove data
-        .select('_id isProcessed uploadRequest completionTimestamp data batchType')
+        .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
         .populate('uploadRequest', 'data')
         .exec()
-        .then(batch => {
-            if (batch) {
+        .then(dataset => {
+            if (dataset) {
                 res.status(200).json({
-                    batch: batch,
+                    dataset: dataset,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:2000/batches/' + batch._id
+                        url: 'http://localhost:2000/datasets/' + dataset._id
 
                     }
                 });
             } else {
-                res.status(404).json({message: 'No valid batch found for provided ID'})
+                res.status(404).json({message: 'No valid dataset found for provided ID'})
             }
         })
         .catch(err => {
@@ -102,17 +133,17 @@ exports.fetch_batch = (req, res, next) => {
         });
 }
 
-exports.delete_batch = (req, res, next) => {
-    const id = req.params.batchId;
-    Order.remove({ _id: id })
+exports.delete_dataset = (req, res, next) => {
+    const id = req.params.datasetId;
+    Dataset.remove({ _id: id })
         .exec()
         .then(result => {
             console.log(result);
             res.status(200).json({
-                message: 'Batch deleted',
+                message: 'Dataset deleted',
                 request: {
                     type: 'POST',
-                    url: 'http://localhost:2000/batches/',
+                    url: 'http://localhost:2000/datasets/',
                     body: { productId: 'ID' }
                 }
             });

@@ -11,7 +11,8 @@ const userSchema = mongoose.Schema({
     password: { type: String, require: true },
     name: { type: String, required: true },
     organization: { type: String, required: true }//,
-    // classifiers: [{ type: mongoose.Schema.Types.objectId, ref: 'Classifier' }]
+    // classifiers: [{ type: mongoose.Schema.Types.objectId, ref: 'Classifier' }],
+    // datasets: [{type: mongoose.Schema.Types.objectId, ref: 'Dataset'}]
 });
 
 module.exports = mongoose.model('User', userSchema)

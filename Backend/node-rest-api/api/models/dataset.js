@@ -1,21 +1,19 @@
 const mongoose = require('mongoose');
 
-const batchSchema = mongoose.Schema({
+const datasetSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     isProcessed: { type: Boolean, default: false },
     uploadRequest: { 
-        userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
+        // userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
         configuration: {
-            classifiers: [
-                {type: mongoose.Schema.Types.ObjectId, ref: 'Batch'}
-            ]
+            classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ]
         },
         uploadTimestamp: {  type : Date, default: Date.now },
     },
     completionTimestamp: {type: Date, default: Date.now },
     data: [{ rowId: mongoose.Schema.Types.ObjectId}],
     // training/ops
-    batchType: {type: Number, required: true}
+    datasetType: {type: Number, required: true}
 });
 
-module.exports = mongoose.model('Batch', batchSchema);
+module.exports = mongoose.model('Dataset', datasetSchema);

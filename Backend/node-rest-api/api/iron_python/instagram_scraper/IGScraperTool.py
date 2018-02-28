@@ -21,7 +21,7 @@ def IG_train(logo_brand, maxImages, outDir):
         <logo_brand>
         This only needs to scrape for pictures
     '''
-    destinationFolder = './images/' #append this with another argument, which will separate the images into folders
+    destinationFolder = './datasets/' #append this with another argument, which will separate the images into folders
     args = {
         'username': [logo_brand],
         'verbose': 0,

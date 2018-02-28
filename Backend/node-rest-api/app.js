@@ -8,7 +8,7 @@ const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/users');
 const classifierRoutes = require('./api/routes/classifiers');
-const batchRoutes = require('./api/routes/batches');
+const datasetRoutes = require('./api/routes/datasets');
 const scraperRoutes = require('./api/routes/scraper');
 
 mongoose.connect(
@@ -43,7 +43,7 @@ app.use('/products', productRoutes);
 app.use('/orders', ordersRoutes);
 app.use('/users', userRoutes);
 app.use('/classifiers', classifierRoutes);
-app.use('/batches', batchRoutes);
+app.use('/datasets', datasetRoutes);
 app.use('/scraper', scraperRoutes);
 
 app.use((req, res, next) => {
