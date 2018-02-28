@@ -89,33 +89,6 @@ exports.scrape_images = (req, res, next) => {
             error: err
         });
     }
-    
-
-    // hashtagScrapeResult.hashtag = hashtag;
-    
-    // var outputImageDirectory = './datasets/' + uid + '/' + req.params.datasetId + '/';
-    // console.log('Output Image Directory: ' + outputImageDirectory);
-    // var options = {
-    //     scriptPath: './api/iron_python/instagram_scraper',
-    //     args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
-    // };
-    
-    // PythonShell.run('IGScraperTool.py', options, function (err, results) {
-    //     if (err) {
-    //         console.log(err);
-    //         res.status(500).json({
-    //             error: err
-    //         });
-    //     }
-    //     // need to figure out why its not returning any results
-    //     console.log('Scrape results: %j', results);
-    //     var files = fs.readdirSync(outputImageDirectory);
-    //     scrapedImages = files.map(filename => outputImageDirectory + results);
-    //     hashtagScrapeResult.fullPaths = scrapedImages;
-    //     res.status(200).json({
-    //         hashtagScrapeResult
-    //     }); 
-    // });
 }
 
 exports.create_dataset = (req, res, next) => {
