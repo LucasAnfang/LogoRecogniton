@@ -59,8 +59,7 @@ exports.scrape_images = (req, res, next) => {
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-        var outputImageDirectory = './datasets/' + uid + '/' + did + '/' + hashtag +'/';
-        // var relativeImageDirectory = './datasets/' + uid + '/' + did + '/' + hashtag + '/';
+        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/' + hashtag +'/';
         console.log('Output Image Directory: ' + outputImageDirectory);
         console.log(process.cwd());
         var options = {
@@ -75,7 +74,7 @@ exports.scrape_images = (req, res, next) => {
                 });
             }
             var files = fs.readdirSync(outputImageDirectory);
-            fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory.substr(2) + filename);
+            fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory + filename);
             res.status(201).json({
                 hashtag: hashtag,
                 filePaths: fullFilenames

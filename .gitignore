@@ -7,7 +7,6 @@ Backend/
 *.jpg
 *.jpeg
 *.png
-*/datasets/*
 *.pyc
 Backend/env/*
 
