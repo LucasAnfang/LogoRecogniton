@@ -2,6 +2,8 @@
 ENV/*
 *node_modules/*
 Backend/node-rest-api/node_modules/
+Backend/node-rest-api/datasets
+Backend/
 */images/*
 *.pyc
 Backend/env/*
