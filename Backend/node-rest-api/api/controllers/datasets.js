@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 var PythonShell = require('python-shell');
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const uid = require('uid');
 
 const Order = require('../models/order');
@@ -10,7 +10,7 @@ const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 
 exports.fetch_all_datasets = (req, res, next) => {
-    Dataset.find()
+    Dataset.find({})
         .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
         .populate('uploadRequest', 'data')
         .exec() //turn it into a real promise
@@ -42,128 +42,79 @@ exports.fetch_all_datasets = (req, res, next) => {
         });
 }
 
-exports.upload_images = (req, res, next) => {
-    // var imageFileName = new Date().toISOString() + file.originalname;
-    console.log(req.body);
-    
-    // File upload code
-    const storage = multer.diskStorage({
-        destination: function(req, file, cb) {
-            cb(null, './datasets/' + req.userData.userId + '/' + req.datasetId + '/uploads/');
-            //get the userid from the token
-            //get the dataset id
-        },
-        filename: function(req, file, cb) {
-            cb(null, new Date().toISOString() + file.originalname);
-        }
-    });
+exports.upload_images;// = multer() => {
 
-    const fileFilter = (req, file, cb) => {
-        // reject a file
-        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-            cb(null, true);
-        }
-        else {
-            cb(null, false);
-        }
-    };
-
-    const upload = multer({
-        storage: storage, 
-        limits: {
-            fileSize: 600 * 600 * 5
-        },
-        fileFilter: fileFilter,
-        onFileSizeLimit: function (file) {
-            // but res (response) object is not existing here
-            file.error = {
-                message: "Upload failed",
-                status: MARankings.Enums.Status.FILE_TOO_LARGE
-                // status: -6
-            };
-        }, onFileUploadComplete: function (file, req, res) {
-            if (file.error){
-                res.send(file.error);
-            }
-        }
-    });
-
-    upload.array('trainingImages');
-    // .then(result => {
-    //     console.log(result);
-    //     res.status(200).json({
-    //         message: 'Handling POST request to /datasets',
-    //         uploadedImage: {
-    //             // name: result.name,
-    //             // price: result.price,
-    //             // _id: result._id,
-    //             // request: {
-    //             //     type: 'GET',
-    //             //     url: 'http://localhost:2000/products/' + result._id
-    //             // }
-    //         }
-    //     });
-    // });
-}
+//}
+// (req, res, next) => {
+//     console.log(req.params.datasetId);
+// }
 
 exports.scrape_images = (req, res, next) => {
-    var hashtag = req.body.hashtag;
-    var uid = req.userData.userId;
-    var image_count = 100;
-    var hashtagScrapeResult = {};
+    try {
+        console.log(req.body)
+        var hashtag = req.body.hashtag;
+        var uid = req.userData.userId;
+        var did = req.params.datasetId;
+        var image_count = 100;
+        var hashtagScrapeResult = {};
 
-    hashtagScrapeResult.hashtag = hashtag;
+        hashtagScrapeResult.hashtag = hashtag;
     
-    var outputImageDirectory = './datasets/' + uid + '/' + req.params.datasetId + '/';
-    console.log('Output Image Directory: ' + outputImageDirectory);
-    var options = {
-        scriptPath: './api/iron_python/instagram_scraper',
-        args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
-    };
-    
-    PythonShell.run('IGScraperTool.py', options, function (err, results) {
-        if (err) {
-            console.log(err);
-            res.status(500).json({
-                error: err
-            });
-        }
-        console.log('Scrape results: %j', results);
-        var files = fs.readdirSync(outputImageDirectory);
-        scrapedImages = files.map(filename => outputImageDirectory + results);
-        hashtagScrapeResult.fullPaths = scrapedImages;
-        res.status(200).json({
-            hashtagScrapeResult
+        var outputImageDirectory = './datasets/' + uid + '/' + did + '/';
+        console.log('Output Image Directory: ' + outputImageDirectory);
+        var options = {
+            scriptPath: './api/iron_python/instagram_scraper',
+            args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
+        };
+        PythonShell.run('IGScraperTool.py', options, function (err, results) {
+            if (err) {
+                console.log(err);
+                res.status(500).json({
+                    error: err
+                });
+            }
+            // need to figure out why its not returning any results
+            console.log('Scrape results: %j', results);
+            var files = fs.readdirSync(outputImageDirectory);
+            scrapedImages = files.map(filename => outputImageDirectory + results);
+            hashtagScrapeResult.fullPaths = scrapedImages;
+            res.status(200).json({
+                hashtagScrapeResult
+            }); 
         });
-    })
-    // .end(function (err) {
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    }
+    
+
+    // hashtagScrapeResult.hashtag = hashtag;
+    
+    // var outputImageDirectory = './datasets/' + uid + '/' + req.params.datasetId + '/';
+    // console.log('Output Image Directory: ' + outputImageDirectory);
+    // var options = {
+    //     scriptPath: './api/iron_python/instagram_scraper',
+    //     args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
+    // };
+    
+    // PythonShell.run('IGScraperTool.py', options, function (err, results) {
     //     if (err) {
     //         console.log(err);
     //         res.status(500).json({
     //             error: err
     //         });
     //     }
+    //     // need to figure out why its not returning any results
     //     console.log('Scrape results: %j', results);
     //     var files = fs.readdirSync(outputImageDirectory);
     //     scrapedImages = files.map(filename => outputImageDirectory + results);
     //     hashtagScrapeResult.fullPaths = scrapedImages;
     //     res.status(200).json({
     //         hashtagScrapeResult
-    //     });
-    // });
-    // .then(result => {
-    //     res.status(200).json({
-    //                 message: 'Handling POST request to /datasets/hashtag',
-    //                 uploadedImage: {
-    //                     // name: result.name,
-    //                     // price: result.price,
-    //                     // _id: result._id,
-    //                     // request: {
-    //                     //     type: 'GET',
-    //                     //     url: 'http://localhost:2000/products/' + result._id
-    //                     // }
-    //                 }
-    //             });
+    //     }); 
     // });
 }
 
@@ -171,14 +122,13 @@ exports.create_dataset = (req, res, next) => {
     console.log(req.userData);
     const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
         //what goes in here
         uploadRequest: {
 
         },
         //what goes in here x2
-        data: {
-
-        },
+        data: {},
         datasetType: req.body.datasetType
     });
     dataset.save()

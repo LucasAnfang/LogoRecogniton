@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const datasetSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    name: { type: String, required: true},
     isProcessed: { type: Boolean, default: false },
     uploadRequest: { 
         // userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
@@ -11,7 +12,7 @@ const datasetSchema = mongoose.Schema({
         uploadTimestamp: {  type : Date, default: Date.now },
     },
     completionTimestamp: {type: Date, default: Date.now },
-    data: [{ rowId: mongoose.Schema.Types.ObjectId}],
+    // images: [{ type: String, required: true }],
     // training/ops
     datasetType: {type: Number, required: true}
 });

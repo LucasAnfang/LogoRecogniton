@@ -21,6 +21,7 @@ app.use(morgan('dev'));
 // make the upload url available
 app.use('/uploads', express.static('uploads'));
 app.use('/images', express.static('images'));
+app.use('/datasets', express.static('datasets'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
