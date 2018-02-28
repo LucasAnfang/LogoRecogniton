@@ -14,11 +14,12 @@ exports.fetch_images_with_hashtag = (req, res, next) => {
         };
         PythonShell.run('IGScraperTool.py', options, function (err, results) {
             if (err) throw err;
-            console.log('results: %j', results);
+            console.log('results definitely totally is: %j', results);
             outputImageDirectory = outputImageDirectory + hashtag + '/';
             outputImageDirectory = outputImageDirectory.substring(2);
             var files = fs.readdirSync(outputImageDirectory);
             fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory + filename);
+            console.log("but full filenames is: " + fullFilenames);
             res.status(201).json({
                 hashtag: hashtag,
                 filePaths: fullFilenames

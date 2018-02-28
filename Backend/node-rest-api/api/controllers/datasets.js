@@ -55,12 +55,12 @@ exports.scrape_images = (req, res, next) => {
         var hashtag = req.body.hashtag;
         var uid = req.userData.userId;
         var did = req.params.datasetId;
-        var image_count = 100;
+        var image_count = 20;
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/';
-        var relativeImageDirectory = '../datasets/' + uid + '/' + did + '/';
+        var outputImageDirectory = './datasets/' + uid + '/' + did + '/' + hashtag +'/';
+        // var relativeImageDirectory = './datasets/' + uid + '/' + did + '/' + hashtag + '/';
         console.log('Output Image Directory: ' + outputImageDirectory);
         console.log(process.cwd());
         var options = {
@@ -74,14 +74,11 @@ exports.scrape_images = (req, res, next) => {
                     error: err
                 });
             }
-            // need to figure out why its not returning any results
-            console.log('Scrape results: %j', results);
-
             var files = fs.readdirSync(outputImageDirectory);
-            scrapedImages = files.map(filename => outputImageDirectory + results);
-            hashtagScrapeResult.fullPaths = scrapedImages;
-            res.status(200).json({
-                hashtagScrapeResult
+            fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory.substr(2) + filename);
+            res.status(201).json({
+                hashtag: hashtag,
+                filePaths: fullFilenames
             });
         });
     }
