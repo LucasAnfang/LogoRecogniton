@@ -4,7 +4,10 @@ ENV/*
 Backend/node-rest-api/node_modules/
 Backend/node-rest-api/datasets
 Backend/
-*/images/*
+*.jpg
+*.jpeg
+*.png
+*/datasets/*
 *.pyc
 Backend/env/*
 
