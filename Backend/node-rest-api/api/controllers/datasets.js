@@ -10,7 +10,7 @@ const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 
 exports.fetch_all_datasets = (req, res, next) => {
-    Dataset.find({})
+    Dataset.find({ uid: req.userData.userId })
         .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
         .populate('uploadRequest', 'data')
         .exec() //turn it into a real promise
@@ -59,9 +59,10 @@ exports.scrape_images = (req, res, next) => {
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-    
-        var outputImageDirectory = './datasets/' + uid + '/' + did + '/';
+        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/';
+        var relativeImageDirectory = '../datasets/' + uid + '/' + did + '/';
         console.log('Output Image Directory: ' + outputImageDirectory);
+        console.log(process.cwd());
         var options = {
             scriptPath: './api/iron_python/instagram_scraper',
             args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
@@ -75,12 +76,13 @@ exports.scrape_images = (req, res, next) => {
             }
             // need to figure out why its not returning any results
             console.log('Scrape results: %j', results);
+
             var files = fs.readdirSync(outputImageDirectory);
             scrapedImages = files.map(filename => outputImageDirectory + results);
             hashtagScrapeResult.fullPaths = scrapedImages;
             res.status(200).json({
                 hashtagScrapeResult
-            }); 
+            });
         });
     }
     catch(err) {
@@ -96,6 +98,7 @@ exports.create_dataset = (req, res, next) => {
     const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
+        uid: req.userData.userId,
         //what goes in here
         uploadRequest: {
 
@@ -132,8 +135,8 @@ exports.fetch_dataset = (req, res, next) => {
     const id = req.params.orderId;
     Dataset.findById(id)
         //maybe remove data
-        .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
-        .populate('uploadRequest', 'data')
+        .select('_id')// name')
+        // .populate('uploadRequest', 'data')
         .exec()
         .then(dataset => {
             if (dataset) {
