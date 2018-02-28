@@ -59,9 +59,10 @@ exports.scrape_images = (req, res, next) => {
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/' + hashtag +'/';
-        console.log('Output Image Directory: ' + outputImageDirectory);
-        console.log(process.cwd());
+        var responseImageDirectory = 'datasets/' + uid + '/' + did + '/' + hashtag +'/';
+        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/';
+        // console.log('Output Image Directory: ' + outputImageDirectory);
+        // console.log(process.cwd());
         var options = {
             scriptPath: './api/iron_python/instagram_scraper',
             args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
@@ -73,8 +74,8 @@ exports.scrape_images = (req, res, next) => {
                     error: err
                 });
             }
-            var files = fs.readdirSync(outputImageDirectory);
-            fullFilenames = files.map(filename => 'http://localhost:2000/' + outputImageDirectory + filename);
+            var files = fs.readdirSync(responseImageDirectory);
+            fullFilenames = files.map(filename => 'http://localhost:2000/' + responseImageDirectory + filename);
             res.status(201).json({
                 hashtag: hashtag,
                 filePaths: fullFilenames
