@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+const multer = require('multer');
+var PythonShell = require('python-shell');
+
+const fs = require('fs');
+const uid = require('uid');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
@@ -38,37 +43,132 @@ exports.fetch_all_datasets = (req, res, next) => {
 }
 
 exports.upload_images = (req, res, next) => {
-    // const product = new Product({
-    //     _id: new mongoose.Types.ObjectId(),
-    //     name: req.body.name,
-    //     price: req.body.price,
-    //     productImage: req.file.path
-    // });
-    // product.save()
-    //     .then(result => {
-    //         console.log(result);
-    //         res.status(200).json({
-    //             message: 'Handling POST request to /products',
-    //             createdProduct: {
-    //                 name: result.name,
-    //                 price: result.price,
-    //                 _id: result._id,
-    //                 request: {
-    //                     type: 'GET',
-    //                     url: 'http://localhost:2000/products/' + result._id
-    //                 }
-    //             }
-    //         });
-    //     })
-    //     .catch(err => {
-    //         console.log(err);
-    //         res.status(500).json({ 
-    //             error: err 
-    //         });
+    // var imageFileName = new Date().toISOString() + file.originalname;
+    console.log(req.body);
+    
+    // File upload code
+    const storage = multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, './datasets/' + req.userData.userId + '/' + req.datasetId + '/uploads/');
+            //get the userid from the token
+            //get the dataset id
+        },
+        filename: function(req, file, cb) {
+            cb(null, new Date().toISOString() + file.originalname);
+        }
+    });
+
+    const fileFilter = (req, file, cb) => {
+        // reject a file
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+            cb(null, true);
+        }
+        else {
+            cb(null, false);
+        }
+    };
+
+    const upload = multer({
+        storage: storage, 
+        limits: {
+            fileSize: 600 * 600 * 5
+        },
+        fileFilter: fileFilter,
+        onFileSizeLimit: function (file) {
+            // but res (response) object is not existing here
+            file.error = {
+                message: "Upload failed",
+                status: MARankings.Enums.Status.FILE_TOO_LARGE
+                // status: -6
+            };
+        }, onFileUploadComplete: function (file, req, res) {
+            if (file.error){
+                res.send(file.error);
+            }
+        }
+    });
+
+    upload.array('trainingImages');
+    // .then(result => {
+    //     console.log(result);
+    //     res.status(200).json({
+    //         message: 'Handling POST request to /datasets',
+    //         uploadedImage: {
+    //             // name: result.name,
+    //             // price: result.price,
+    //             // _id: result._id,
+    //             // request: {
+    //             //     type: 'GET',
+    //             //     url: 'http://localhost:2000/products/' + result._id
+    //             // }
+    //         }
     //     });
+    // });
+}
+
+exports.scrape_images = (req, res, next) => {
+    var hashtag = req.body.hashtag;
+    var uid = req.userData.userId;
+    var image_count = 100;
+    var hashtagScrapeResult = {};
+
+    hashtagScrapeResult.hashtag = hashtag;
+    
+    var outputImageDirectory = './datasets/' + uid + '/' + req.params.datasetId + '/';
+    console.log('Output Image Directory: ' + outputImageDirectory);
+    var options = {
+        scriptPath: './api/iron_python/instagram_scraper',
+        args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
+    };
+    
+    PythonShell.run('IGScraperTool.py', options, function (err, results) {
+        if (err) {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        }
+        console.log('Scrape results: %j', results);
+        var files = fs.readdirSync(outputImageDirectory);
+        scrapedImages = files.map(filename => outputImageDirectory + results);
+        hashtagScrapeResult.fullPaths = scrapedImages;
+        res.status(200).json({
+            hashtagScrapeResult
+        });
+    })
+    // .end(function (err) {
+    //     if (err) {
+    //         console.log(err);
+    //         res.status(500).json({
+    //             error: err
+    //         });
+    //     }
+    //     console.log('Scrape results: %j', results);
+    //     var files = fs.readdirSync(outputImageDirectory);
+    //     scrapedImages = files.map(filename => outputImageDirectory + results);
+    //     hashtagScrapeResult.fullPaths = scrapedImages;
+    //     res.status(200).json({
+    //         hashtagScrapeResult
+    //     });
+    // });
+    // .then(result => {
+    //     res.status(200).json({
+    //                 message: 'Handling POST request to /datasets/hashtag',
+    //                 uploadedImage: {
+    //                     // name: result.name,
+    //                     // price: result.price,
+    //                     // _id: result._id,
+    //                     // request: {
+    //                     //     type: 'GET',
+    //                     //     url: 'http://localhost:2000/products/' + result._id
+    //                     // }
+    //                 }
+    //             });
+    // });
 }
 
 exports.create_dataset = (req, res, next) => {
+    console.log(req.userData);
     const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
         //what goes in here
@@ -105,6 +205,7 @@ exports.create_dataset = (req, res, next) => {
 }
 
 exports.fetch_dataset = (req, res, next) => {
+    console.log(req.userData.userId);
     const id = req.params.orderId;
     Dataset.findById(id)
         //maybe remove data
