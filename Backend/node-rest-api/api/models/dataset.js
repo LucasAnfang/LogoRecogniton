@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const datasetSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: { type: String, required: true },
-    // userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
+    userId: {  type: String, required: true },
     isProcessed: { type: Boolean, default: false },
     uploadRequest: { 
         // userID: {  type: mongoose.Schema.Types.ObjectId, required: true },

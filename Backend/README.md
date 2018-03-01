@@ -2,11 +2,11 @@
 
 Setup
 ##
-logo detection REST API using Node.js and mongo
+Logo detection REST API using Node.js and mongo
 
-Pull this project and 'npm install' on your machine to finish setup if you want to work on the rest api component.
+Pull this project and 'npm install' on your machine (in the Backend/node-rest-api folder) to finish setup if you want to work on the rest api component.
 
-image processing is done un the python section (in py) 
+Image processing is done un the python section (in py) 
 
 Tutorial link: https://www.youtube.com/watch?v=0oXYLzuucwE&t=7s
 
@@ -19,14 +19,11 @@ pip install virtualenv
 cd Backend
 virtualenv -p /usr/bin/python2.7 env
 source env/bin/activate
-
-// install the requirements.txt inside the py folder
-cd py/src
-pip install -r requirements.txt
+pip install -r py/src/requirements.txt
  
 Server startup
 ##
-To start the node server, type
+To start the node server, enter the Backend/node-rest-api folder and type:
 npm start
 
 

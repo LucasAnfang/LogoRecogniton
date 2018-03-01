@@ -10,8 +10,9 @@ const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 
 exports.fetch_all_datasets = (req, res, next) => {
+    // console.log(req.userData.userId);
     Dataset.find({
-        'uid': req.userData.userId
+        'userId': req.userData.userId
     })
     .select('_id name')
     .exec() //turn it into a real promise
@@ -95,7 +96,7 @@ exports.create_dataset = (req, res, next) => {
     const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        uid: req.userData.userId,
+        userId: req.userData.userId,
         //what goes in here
         uploadRequest: {},
         //what goes in here x2
