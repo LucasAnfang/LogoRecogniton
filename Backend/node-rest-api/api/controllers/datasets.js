@@ -10,36 +10,37 @@ const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 
 exports.fetch_all_datasets = (req, res, next) => {
-    Dataset.find({ uid: req.userData.userId })
-        .select('_id isProcessed uploadRequest completionTimestamp data datasetType')
-        .populate('uploadRequest', 'data')
-        .exec() //turn it into a real promise
-        .then(docs => {
-            console.log(docs);
-            res.status(200).json({
-                count: docs.length,
-                classifiers: docs.map(doc => {
-                    return {
-                        _id: doc._id,
-                        isProcessed: doc.isProcessed,
-                        uploadRequest: doc.uploadRequest,
-                        completionTimestamp: doc.completionTimestamp,
-                        data: doc.data,
-                        datasetType: doc.datasetType,
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:2000/datasets/' + doc._id
-                        }
-                    };
-                })
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({
-                error: err
-            });
+    Dataset.find({
+        'uid': req.userData.userId
+    })
+    .select('_id name')
+    .exec() //turn it into a real promise
+    .then(docs => {
+        console.log(docs);
+        res.status(200).json({
+            count: docs.length,
+            classifiers: docs.map(doc => {
+                return {
+                    _id: doc._id,
+                    isProcessed: doc.isProcessed,
+                    uploadRequest: doc.uploadRequest,
+                    completionTimestamp: doc.completionTimestamp,
+                    data: doc.data,
+                    datasetType: doc.datasetType,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:2000/datasets/' + doc._id
+                    }
+                };
+            })
         });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    });
 }
 
 exports.upload_images;// = multer() => {
@@ -58,8 +59,8 @@ exports.scrape_images = (req, res, next) => {
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-        var responseImageDirectory = 'datasets/' + uid + '/' + did + '/' + hashtag +'/';
-        var outputImageDirectory = 'datasets/' + uid + '/' + did + '/';
+        var responseImageDirectory = 'datasets/' + did + '/' + hashtag +'/';
+        var outputImageDirectory = 'datasets/' + did + '/';
         // console.log('Output Image Directory: ' + outputImageDirectory);
         // console.log(process.cwd());
         var options = {
@@ -96,9 +97,7 @@ exports.create_dataset = (req, res, next) => {
         name: req.body.name,
         uid: req.userData.userId,
         //what goes in here
-        uploadRequest: {
-
-        },
+        uploadRequest: {},
         //what goes in here x2
         data: {},
         datasetType: req.body.datasetType
@@ -128,7 +127,7 @@ exports.create_dataset = (req, res, next) => {
 
 exports.fetch_dataset = (req, res, next) => {
     console.log(req.userData.userId);
-    const id = req.params.orderId;
+    const id = req.params.datasetId;
     Dataset.findById(id)
         //maybe remove data
         .select('_id')// name')
