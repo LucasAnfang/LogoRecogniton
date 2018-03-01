@@ -168,7 +168,7 @@ def main():
             return
         else:
             # print(args.operate)
-            IG_operate(args.logo, args.operate, args.max_images, args.output_directory)
+            IG_operate(args.logo, args.operate, args.max_images) #, args.output_directory)
             return
 
 if __name__ == '__main__':

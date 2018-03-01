@@ -51,7 +51,6 @@ exports.upload_images;// = multer() => {
 
 exports.scrape_images = (req, res, next) => {
     try {
-        console.log(req.body)
         var hashtag = req.body.hashtag;
         var uid = req.userData.userId;
         var did = req.params.datasetId;
