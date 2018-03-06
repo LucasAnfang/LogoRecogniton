@@ -55,15 +55,13 @@ exports.scrape_images = (req, res, next) => {
     try {
         var hashtag = req.body.hashtag;
         var uid = req.userData.userId;
-        var did = req.params.datasetId;
+        var d_id = req.params.datasetId;
         var image_count = 20;
         var hashtagScrapeResult = {};
 
         hashtagScrapeResult.hashtag = hashtag;
-        var responseImageDirectory = 'datasets/' + did + '/' + hashtag +'/';
-        var outputImageDirectory = 'datasets/' + did + '/';
-        // console.log('Output Image Directory: ' + outputImageDirectory);
-        // console.log(process.cwd());
+        var responseImageDirectory = 'datasets/' + d_id + '/' + hashtag +'/';
+        var outputImageDirectory = 'datasets/' + d_id + '/';
         var options = {
             scriptPath: './api/iron_python/instagram_scraper',
             args: ['-hi', hashtag, '-d', outputImageDirectory, '-m', image_count]
@@ -92,7 +90,7 @@ exports.scrape_images = (req, res, next) => {
 }
 
 exports.create_dataset = (req, res, next) => {
-    console.log(req.userData);
+    // console.log(req.userData);
     const dataset = new Dataset({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -109,8 +107,9 @@ exports.create_dataset = (req, res, next) => {
             res.status(200).json({
                 message: 'Handling POST request to /datasets',
                 createdDataset: {
-                    name: result.name,
                     _id: result._id,
+                    name: result.name,
+                    datasetType: result.datasetType,
                     request: {
                         type: 'GET',
                         url: 'http://localhost:2000/datasets/' + result._id
@@ -156,25 +155,86 @@ exports.fetch_dataset = (req, res, next) => {
         });
 }
 
-exports.delete_dataset = (req, res, next) => {
-    const id = req.params.datasetId;
-    Dataset.remove({ _id: id })
-        .exec()
-        .then(result => {
-            console.log(result);
-            res.status(200).json({
-                message: 'Dataset deleted',
+exports.create_classifier = (req, res, next) => {
+    
+    const classifier = new Classifier({
+        _id: new mongoose.Types.ObjectId(),
+        // need to find a way to get this from the token?
+        name: req.body.name,
+        ownerId: req.userData.userId,
+        description: req.body.description,
+        subscriberIds: [],
+        // need to figure out how to get these two automatically
+        index: [],
+        nodes: [],
+    });
+    classifier.save()
+    .then(result => {
+        console.log(result);
+        res.status(200).json({
+            message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
+            createdClassifier: {
+                name: result.name,
+                ownerId: result.ownerId,
+                description: req.body.description,
+                _id: result._id,
                 request: {
-                    type: 'POST',
-                    url: 'http://localhost:2000/datasets/',
-                    body: { productId: 'ID' }
+                    type: 'GET',
+                    url: 'http://localhost:2000/classifiers/' + result._id
                 }
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ 
-                error: err 
-            });
+            }
         });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ 
+            error: err 
+        });
+    });
+}
+
+
+exports.delete_dataset = (req, res, next) => {
+    var id = req.params.datasetId;
+    var uid = req.userData.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        res.status(400).json({ 
+            error: "DatasetID is not a valid ID"
+        });
+    }
+    else {
+        Dataset.findOne({ _id: id}, function (err, docs){
+            // need to fix error codes
+            if (!docs) {
+                res.status(400).json({ 
+                    error: "Dataset doesn't exist"
+                });
+            } else {
+                if (docs.userId != uid) {
+                    res.status(400).json({ 
+                        error: "Dataset doesn't belong to user"
+                    });
+                } else {
+                    Dataset.remove({ _id: id, userId: uid })
+                    .exec()
+                    .then(result => {
+                        res.status(200).json({
+                            message: 'Dataset Deleted',
+                            request: {
+                                type: 'POST',
+                                url: 'http://localhost:2000/datasets'
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({ 
+                            error: err
+                        });
+                    });
+                }
+            }
+        }); 
+    }
 }
