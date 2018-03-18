@@ -1,0 +1,210 @@
+{
+	"info": {
+		"name": "LogoRecognition API",
+		"_postman_id": "437d04dd-eddf-47d9-9d3a-c8f47eddafd1",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"test@gmail.com\",\n\t\"password\": \"test\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/users/login",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"users",
+						"login"
+					]
+				},
+				"description": "Uses test@gmail.com/test"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all datasets",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:2000/datasets",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets"
+					]
+				},
+				"description": "This returns all of the user's datasets.\nRemember to include the token."
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new dataset",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test\",\n\t\"datasetType\": \"0\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Scrape to a dataset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"hashtag\": \"nike\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaec0495f4acb29e6f76d07/scrape",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaec0495f4acb29e6f76d07",
+						"scrape"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Upload to a dataset (broken)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "trainingImages",
+							"value": "",
+							"description": "",
+							"type": "file"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaec0495f4acb29e6f76d07/upload",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaec0495f4acb29e6f76d07",
+						"upload"
+					]
+				},
+				"description": "(broken)"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a dataset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaec0495f4acb29e6f76d07",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaec0495f4acb29e6f76d07"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
