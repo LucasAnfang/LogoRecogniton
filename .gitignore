@@ -3,6 +3,7 @@ ENV/*
 *node_modules/*
 Backend/node-rest-api/node_modules/
 Backend/node-rest-api/datasets
+Backend/
 *.jpg
 *.jpeg
 *.png
