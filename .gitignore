@@ -3,7 +3,8 @@ ENV/*
 *node_modules/*
 Backend/node-rest-api/node_modules/
 Backend/node-rest-api/datasets
-Backend/
+Backend/package-lock.json
+Backend/node-rest-api/instagram-scraper.log
 *.jpg
 *.jpeg
 *.png
