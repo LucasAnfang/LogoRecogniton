@@ -5,10 +5,10 @@ const datasetSchema = mongoose.Schema({
     name: { type: String, required: true },
     userId: {  type: String, required: true },
     isProcessed: { type: Boolean, default: false },
+    classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ],
     uploadRequest: { 
-        // userID: {  type: mongoose.Schema.Types.ObjectId, required: true },
         configuration: {
-            classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ]
+            // classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ]
         },
         uploadTimestamp: {  type : Date, default: Date.now },
     },

@@ -2,17 +2,19 @@ const mongoose = require('mongoose');
 
 const classifierSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    ownerId: { type: Number, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    parentDatasetId: {type: mongoose.Schema.Types.ObjectId, required: true},
+    name: { type: String, required: true },
     description: { type: String, required: true },
-    // trainingsSets: [ { type: mongoose.Schema.Types.ObjectId } ],
-    subscriberIds: [ { type: mongoose.Schema.Types.ObjectId } ],
+    // subscriberIds: [ { type: mongoose.Schema.Types.ObjectId } ],
     isPublic: { type: Boolean, default: false },
     // index for tensorflow
-    index: { type: mongoose.Schema.Types.ObjectId, required: true },
+    classifierIndex: { type: String, required: true },
     nodes: [
         {
             name: { type: String, required: true },
-            index: { type: Number, required: true }
+            index: { type: Number, required: true },
+            trainingData: [ { type: String, required: true } ]
         }
     ]
 });

@@ -81,8 +81,8 @@ exports.create_classifier = (req, res, next) => {
 exports.fetch_classifier = (req, res, next) => {
     const id = req.params.orderId;
     Classifier.findById(id)
-        .select('name ownerId trainingsSets subscriberIds')
-        .populate('trainingSets', '')
+        .select('name _id userId parentDatasetId description classifierIndex nodes')
+        .populate('nodes', 'trainingData')
         .exec()
         .then(classifier => {
             if (classifier) {
