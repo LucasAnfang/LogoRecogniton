@@ -78,7 +78,9 @@ exports.create_classifier = (req, res, next) => {
         });
 }
 
+//TODO: make this work
 exports.fetch_classifier = (req, res, next) => {
+    console.log('in fetch classifier')
     const id = req.params.orderId;
     Classifier.findById(id)
         .select('name _id userId parentDatasetId description classifierIndex nodes')
@@ -86,6 +88,7 @@ exports.fetch_classifier = (req, res, next) => {
         .exec()
         .then(classifier => {
             if (classifier) {
+                console.log("classifier is ", classifier);
                 res.status(200).json({
                     classifier: classifier,
                     request: {

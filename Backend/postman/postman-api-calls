@@ -68,6 +68,16 @@
 		{
 			"name": "Create a new dataset",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{

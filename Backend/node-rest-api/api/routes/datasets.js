@@ -44,7 +44,7 @@ router.delete('/:datasetId', checkAuth, DatasetController.delete_dataset);
 //classifiers
 router.post('/:datasetId/classifiers', checkAuth, DatasetController.create_classifier);
 router.get('/:datasetId/classifiers', checkAuth, DatasetController.fetch_dataset_classifiers);
-// router.get('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.fetch_dataset_classifiers);
-// router.patch('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.update_classifier);
+router.get('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.fetch_classifier);
+router.patch('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.update_classifier);
 
 module.exports = router;

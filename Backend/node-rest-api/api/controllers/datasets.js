@@ -265,11 +265,13 @@ exports.create_classifier = (req, res, next) => {
 
                 classifier.save()
                     .then(result => {
-
+                        console.log("adding to the dataset");
                         dataset.classifiers.push(classifier._id);
                         dataset.save();
+                        console.log("size is " , dataset.classifiers.length)
 
                         console.log(result);
+                        console.log("name is ", result.name);
                         return res.status(200).json({
                             message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
                             createdClassifier: 
@@ -300,19 +302,18 @@ exports.create_classifier = (req, res, next) => {
 
 exports.fetch_dataset_classifiers = (req, res, next) => {
     const datasetId = req.params.datasetId;
-    console.log(datasetId);
+    console.log("datasetId is ", datasetId);
 
-    
-    Dataset.findById(datasetId)
-        .select('classifiers')
+    Classifier.find({
+        'parentDatasetId': req.params.datasetId
+   })
         .populate('classifiers', '_id name description trainingData')
         .exec()
         .then(results => {
             if (results) {
-                console.log(results);
                 res.status(200).json({
-                    count: results.classifiers.length,
-                    classifier: results.classifiers.map(doc => {
+                    count: results.length,
+                    classifier: results.map(doc => {
                         return {
                             id: doc._id,
                             name: doc.name,
@@ -331,9 +332,108 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({
                 error: err
             });
         });
+}
+
+exports.fetch_classifier = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    console.log("classifierId is ", classifierId);
+        Classifier.findById(classifierId)
+        .select('_id, name description')
+        .exec()
+        .then(doc => {
+            if (doc) {
+                res.status(200).json({
+                            id: doc._id,
+                            name: doc.name,
+                            description: doc.description,
+                            // nodes: classifier.nodes,
+                });
+            } else {
+                res.status(404).json({message: 'No valid classifier found for provided ID'})
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });
+}
+
+exports.update_classifier = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    // const classifier = Classifier.findById(classifierId);
+    // const parent = classifier.parentDatasetId;
+    const updateOps = {};
+    for (const ops of Array.from(req.body)) {
+        updateOps[ops.propName] = ops.value;
+    }
+    Classifier.update({ _id: classifierId }, { $set: updateOps}) 
+        .exec()
+        .then(result => {
+            console.log(result);
+            res.status(200).json({
+                message: 'Classifier updated',
+                request: {
+                    type: 'GET',
+                    // url: 'http://localhost:3000/datasets/' + parentDatasetId + '/classifiers/' + classifierId
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ 
+                error: err 
+            });
+        });   
+            
+}
+
+exports.delete_classifier = (req, res, next) => {
+    var id = req.params.classifierId;
+    var uid = req.userData.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    }
+    else {
+        
+        Classifier.findOne({ _id: id}, function (err, docs){
+            // need to fix error codes
+            if (docs) {
+                if (docs.userId != uid) {
+                    res.status(400).json({ 
+                        error: "Classifier doesn't belong to user"
+                    });
+                } else {
+                    Classifier.remove({ _id: id, userId: uid })
+                        .exec()
+                        .then(result => {
+                            res.status(200).json({
+                                message: 'Classifier Deleted',
+                                request: {
+                                    type: 'POST',
+                                    url: 'http://localhost:2000/datasets'
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.status(500).json({ 
+                                error: err
+                            });
+                        });
+                }
+            } else {
+                res.status(400).json({ 
+                    error: "Classifier doesn't exist"
+                });
+            }
+        }); 
+    }
 }
