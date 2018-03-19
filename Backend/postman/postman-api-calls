@@ -1,8 +1,7 @@
 {
 	"info": {
-		"name": "LogoRecognition API",
 		"_postman_id": "437d04dd-eddf-47d9-9d3a-c8f47eddafd1",
-		"description": "",
+		"name": "LogoRecognition API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -98,8 +97,45 @@
 					"path": [
 						"datasets"
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a dataset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
 				},
-				"description": ""
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"hashtag\": \"nike\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaedddcfef3b43e00e1dbd3",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaedddcfef3b43e00e1dbd3"
+					]
+				}
 			},
 			"response": []
 		},
@@ -116,7 +152,7 @@
 						}
 					]
 				},
-				"method": "POST",
+				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -128,18 +164,16 @@
 					"raw": "{\n\t\"hashtag\": \"nike\"\n}"
 				},
 				"url": {
-					"raw": "localhost:2000/datasets/5aaec0495f4acb29e6f76d07/scrape",
+					"raw": "localhost:2000/datasets/5aaedddcfef3b43e00e1dbd3",
 					"host": [
 						"localhost"
 					],
 					"port": "2000",
 					"path": [
 						"datasets",
-						"5aaec0495f4acb29e6f76d07",
-						"scrape"
+						"5aaedddcfef3b43e00e1dbd3"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		},
@@ -202,17 +236,134 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "localhost:2000/datasets/5aaec0495f4acb29e6f76d07",
+					"raw": "localhost:2000/datasets/5aaee23aafad8c3f882ea123",
 					"host": [
 						"localhost"
 					],
 					"port": "2000",
 					"path": [
 						"datasets",
-						"5aaec0495f4acb29e6f76d07"
+						"5aaee23aafad8c3f882ea123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create classifier",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDkxNDUxLCJleHAiOjE1MjE1Nzc4NTF9.kQ9ko5c2ivAU4TtlRlOnRk1Vx646OF7ja5WrU3Q41KA",
+							"type": "string"
+						}
 					]
 				},
-				"description": ""
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test-classifier\",\n\t\"description\": \"this is a test\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaf066db8563f4668fec1bd/classifiers",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaf066db8563f4668fec1bd",
+						"classifiers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all classifiers in a dataset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test-classifier\",\n\t\"description\": \"this is a test\"\n\t\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaf066db8563f4668fec1bd/classifiers",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaf066db8563f4668fec1bd",
+						"classifiers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a classifier in a dataset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDkxNDUxLCJleHAiOjE1MjE1Nzc4NTF9.kQ9ko5c2ivAU4TtlRlOnRk1Vx646OF7ja5WrU3Q41KA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test-classifier\",\n\t\"description\": \"this is a test\"\n}"
+				},
+				"url": {
+					"raw": "localhost:2000/datasets/5aaf066db8563f4668fec1bd/classifiers/5aaf07b30cd04b46cec6630d",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5aaf066db8563f4668fec1bd",
+						"classifiers",
+						"5aaf07b30cd04b46cec6630d"
+					]
+				}
 			},
 			"response": []
 		}
