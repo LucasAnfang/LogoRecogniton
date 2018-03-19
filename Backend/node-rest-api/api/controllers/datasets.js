@@ -39,11 +39,12 @@ exports.fetch_all_datasets = (req, res, next) => {
                 datasets: docs.map(doc => {
                     return {
                         _id: doc._id,
-                        isProcessed: doc.isProcessed,
-                        uploadRequest: doc.uploadRequest,
-                        completionTimestamp: doc.completionTimestamp,
-                        data: doc.data,
-                        datasetType: doc.datasetType,
+                        name: doc.name,
+                        // isProcessed: doc.isProcessed,
+                        // uploadRequest: doc.uploadRequest,
+                        // completionTimestamp: doc.completionTimestamp,
+                        // data: doc.data,
+                        // datasetType: doc.datasetType,
                         request: {
                             type: 'GET',
                             url: 'http://localhost:2000/datasets/' + doc._id
@@ -167,6 +168,14 @@ exports.fetch_dataset = (req, res, next) => {
             } else if (dataset.userId != req.userData.userId) {
                 res.status(404).json({message: 'Dataset doesn\'t belong to user'})
             } else {
+                // const testFolder = '/datasets/';
+
+                // fs.readdir(testFolder, (err, files) => {
+                //     files.forEach(file => {
+                //         console.log(file);
+                //     });
+                // })
+
                 res.status(200).json({
                     dataset: dataset,
                     request: {
