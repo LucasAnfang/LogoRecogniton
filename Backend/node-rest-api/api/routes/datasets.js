@@ -33,7 +33,7 @@ const upload = multer({
 });
 
 
-//datasets
+//dataset routes
 router.get('/', checkAuth, DatasetController.fetch_all_datasets);
 router.post('/', checkAuth, DatasetController.create_dataset);
 router.post('/:datasetId/upload', checkAuth, upload.array('trainingImages'));
@@ -41,10 +41,10 @@ router.post('/:datasetId/scrape', checkAuth, DatasetController.scrape_images);
 router.get('/:datasetId', checkAuth, DatasetController.fetch_dataset);
 router.delete('/:datasetId', checkAuth, DatasetController.delete_dataset);
 
-//classifiers
+//classifier routes
 router.post('/:datasetId/classifiers', checkAuth, DatasetController.create_classifier);
 router.get('/:datasetId/classifiers', checkAuth, DatasetController.fetch_dataset_classifiers);
 router.get('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.fetch_classifier);
 router.patch('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.update_classifier);
-
+router.delete('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.delete_classifier);
 module.exports = router;
