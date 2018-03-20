@@ -127,7 +127,10 @@ exports.scrape_images = (req, res, next) => {
                 var hashtag = req.body.hashtag;
                 var uid = req.userData.userId;
                 var d_id = req.params.datasetId;
-                var image_count = 20;
+                var image_count = req.body.image_count;
+                if (req.body.image_count == null) {
+                    image_count = 15;
+                }
                 var hashtagScrapeResult = {};
         
                 hashtagScrapeResult.hashtag = hashtag;
