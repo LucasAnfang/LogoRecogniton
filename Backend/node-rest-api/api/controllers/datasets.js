@@ -10,6 +10,43 @@ const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 const Classifier = require('../models/classifier');
 
+// code from https://stackoverflow.com/questions/41462606/get-all-files-recursively-in-directories-nodejs
+function traverseDirectory(dirname, callback) {
+    var directory = [];
+    var output = [];
+    fs.readdir(dirname, function(err, list) {
+        // dirname = fs.realpathSync(dirname);
+        console.log('dirname: ' + dirname);
+
+        if (err) {
+            return callback(err);
+        }
+        var listlength = list.length;
+        list.forEach(function(file) {
+            outputname = file;
+            // console.log(outputname);
+            file = dirname + file;
+            console.log(file);
+            fs.stat(file, function(err, stat) {
+                directory.push(file);
+                output.push(outputname);
+                if (stat && stat.isDirectory()) {
+                    traverseDirectory(file, function(err, parsed) {
+                        directory = directory.concat(parsed);
+                        if (!--listlength) {
+                            callback(null, directory);
+                        }
+                    });
+                } else {
+                    if (!--listlength) {
+                        callback(null, directory);
+                    }
+                }
+            });
+        });
+    });
+}
+
 // delete files in folder
 var deleteFolderRecursive = function(path) {
     if (fs.existsSync(path)) {
@@ -33,6 +70,8 @@ exports.fetch_all_datasets = (req, res, next) => {
         .select('_id name')
         .exec() //turn it into a real promise
         .then(docs => {
+            
+
             console.log(docs);
             res.status(200).json({
                 count: docs.length,
@@ -40,6 +79,7 @@ exports.fetch_all_datasets = (req, res, next) => {
                     return {
                         _id: doc._id,
                         name: doc.name,
+                        cover: 'http://localhost:2000/' + 'assets/noimages.png',
                         // isProcessed: doc.isProcessed,
                         // uploadRequest: doc.uploadRequest,
                         // completionTimestamp: doc.completionTimestamp,
@@ -168,21 +208,20 @@ exports.fetch_dataset = (req, res, next) => {
             } else if (dataset.userId != req.userData.userId) {
                 res.status(404).json({message: 'Dataset doesn\'t belong to user'})
             } else {
-                // const testFolder = '/datasets/';
-
-                // fs.readdir(testFolder, (err, files) => {
-                //     files.forEach(file => {
-                //         console.log(file);
-                //     });
-                // })
-
-                res.status(200).json({
-                    dataset: dataset,
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:2000/datasets/' + dataset._id
-
+                const folder = 'datasets/' + req.params.datasetId + '/'; //+ req.params.datasetId + '/';
+                traverseDirectory(folder, function(err, result) {
+                    if (err) {
+                        console.log(err);
                     }
+                    // console.log(result);
+                    res.status(200).json({
+                        dataset: dataset,
+                        cover: 'http://localhost:2000/' + 'assets/noimages.png',
+                        request: {
+                            type: 'GET',
+                            url: 'http://localhost:2000/datasets/' + dataset._id
+                        }
+                    });
                 });
             }
         })
@@ -247,7 +286,6 @@ exports.delete_dataset = (req, res, next) => {
 
 
 // classifiers
-
 exports.create_classifier = (req, res, next) => {
 
     const datasetId = req.params.datasetId;

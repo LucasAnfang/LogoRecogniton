@@ -22,6 +22,7 @@ app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'));
 app.use('/images', express.static('images'));
 app.use('/datasets', express.static('datasets'));
+app.use('/assets', express.static('assets'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
