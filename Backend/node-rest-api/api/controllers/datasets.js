@@ -226,7 +226,7 @@ exports.fetch_dataset = (req, res, next) => {
                         console.log(err);
                     }
                     if (result.length != 0) {
-                        coverImage = result[0];
+                        coverImage = 'http://localhost:2000/' + result[0];
                     } else {
                         coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
                     }
