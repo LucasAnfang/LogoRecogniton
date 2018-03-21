@@ -31,7 +31,11 @@ function traverseDirectory(dirname, callback) {
             file = dirname + file;
             // console.log("file is: " + file);
             fs.stat(file, function(err, stat) {
-                if (isImage(file)) directory.push(file);
+                if (isImage(file)) {
+                    directory.push(file);
+                } else {
+                    file = file + "/";
+                }
                 output.push(outputname);
                 if (stat && stat.isDirectory()) {
                     traverseDirectory(file, function(err, parsed) {
