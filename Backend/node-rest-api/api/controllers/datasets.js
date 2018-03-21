@@ -206,6 +206,7 @@ exports.create_dataset = (req, res, next) => {
 }
 
 exports.fetch_dataset = (req, res, next) => {
+    var coverImage;
     console.log(req.userData.userId);
     const id = req.params.datasetId;
     Dataset.findById(id)
@@ -224,10 +225,15 @@ exports.fetch_dataset = (req, res, next) => {
                     if (err) {
                         console.log(err);
                     }
+                    if (result.length != 0) {
+                        coverImage = result[0];
+                    } else {
+                        coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                    }
                     // console.log(result);
                     res.status(200).json({
                         dataset: dataset,
-                        cover: 'http://localhost:2000/' + 'assets/noimages.png',
+                        cover: coverImage,
                         images: result,
                         request: {
                             type: 'GET',
