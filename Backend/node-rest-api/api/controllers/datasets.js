@@ -19,7 +19,6 @@ function traverseDirectory(dirname, callback) {
     fs.readdir(dirname, function(err, list) {
         // dirname = fs.realpathSync(dirname);
         // console.log('dirname: ' + dirname);
-
         if (err) {
             return callback(err);
         }
@@ -224,22 +223,32 @@ exports.fetch_dataset = (req, res, next) => {
                     console.log("traverseDirectory result is: " + result);
                     if (err) {
                         console.log(err);
+                        res.status(300).json({message: 'Dataset is empty'})
                     }
-                    if (result.length != 0) {
+                    else if (result.length != 0) {
                         coverImage = 'http://localhost:2000/' + result[0];
+                        res.status(200).json({
+                            dataset: dataset,
+                            cover: coverImage,
+                            images: result,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:2000/datasets/' + dataset._id
+                            }
+                        });
                     } else {
                         coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                        res.status(200).json({
+                            dataset: dataset,
+                            cover: coverImage,
+                            images: result,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:2000/datasets/' + dataset._id
+                            }
+                        });
                     }
                     // console.log(result);
-                    res.status(200).json({
-                        dataset: dataset,
-                        cover: coverImage,
-                        images: result,
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:2000/datasets/' + dataset._id
-                        }
-                    });
                 });
             }
         })
