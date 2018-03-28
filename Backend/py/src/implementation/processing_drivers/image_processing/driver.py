@@ -3,35 +3,71 @@ from PIL import Image
 from array import array
 import os
 import sys
+# added requests for calls to your APIs
+import requests
+
+# TODO if the system said cant find module look at this next line 
+# (modules in different directories need to be referenced through system paths)
 sys.path.append(os.path.join(os.path.dirname(__file__),'../../..'))
-from src.storage_controller.NetworkedFileSystem.input_controller import InputController
-from src.storage_controller.NetworkedFileSystem.checkpoint_controller import CheckpointController
-from src.storage_controller.Entities.instagram_post_entity import InstagramPostEntities
-from src.storage_controller.TableManagers.table_manager import TableStorageConnector
+from implementation.storage_controller.NetworkedFileSystem.input_controller import InputController
+from implementation.storage_controller.NetworkedFileSystem.checkpoint_controller import CheckpointController
+from implementation.storage_controller.Entities.instagram_post_entity import InstagramPostEntities
+from implementation.storage_controller.TableManagers.table_manager import TableStorageConnector
 
-from src.models import train_image_classifier as train
-from src.models import test_build as test
-from src.models.datasets import convert_my as convert
-from src.models import image_utils
+from implementation.models import train_image_classifier as train
+from implementation.models import test_build as test
+from implementation.models.datasets import convert_my as convert
+from implementation.models import image_utils
+'''
+TODO: 
+AS YOU REMOVE MODULES DOWN BELOW, LOOK UP AT THE IMPORTS AND REMOVE THEM
 
+Post entities (list of dictionaries) comes up a lot 
+The idea was keeping all the dataset entities in one object
+That object includes the image binaries, path, and post metadata (caption, hashtags, user, etc.)
 
+You should find a point in your workflow to stitch the results from this with the rest of the
+information associated with a post you are classifying the image of
+'''
 class Driver:
 	def __init__(self, input_config):
+		# TODO: no input controller this will be your rest api to call storage
 		self.input_controller = InputController(input_config)
+
 		self.checkpoint_controller = CheckpointController(input_config)
+		# TODO: use mongo for storing results
 		self.table_manager = TableStorageConnector(input_config)
-		self.checkpoint_directory = "../../../resources/train"
+		# TODO: This now stored on your rest API so ignore this and make calls to routes to grab and store checkpoints
+		self.checkpoint_directory = "../../../resources/train" 
+		# if it has been tested
 		self.testvar = False
 
 	def download_checkpoints(self):
-		return
-		self.checkpoint_controller.download_checkpoints(destination_directory = self.checkpoint_directory+'/prev')
+		# TODO: This now using your rest api
+		return self.checkpoint_controller.download_checkpoints(destination_directory = self.checkpoint_directory+'/prev')
 
 	def upload_checkpoints(self):
+		# TODO: This now using your rest api
 		self.checkpoint_controller.upload_checkpoints(self.checkpoint_directory+'/prev')
 
 	def start_processing(self):
+		'''
+			TODO: 
+			T = Grab all datasets that are needed for training (and their associated classifiers)
+			C = Grab all datasets that are needed for classification (and their associated classifiers)
+
+			Loop through T training each look into self.process_training_post_entries
+			I think you should store in the dataset a time taken to complete 
+			as well as the flag for representing work completed 
+
+			Loop through T training each look into self.process_operational_post_entries (Refactor function names)
+			I think you should store in the dataset a time taken to complete 
+			as well as the flag for representing work completed 
+
+		'''
+
 		print("starting driver...")
+		
 		self.brand_names = self.retrieve_supported_brands()
 
 		self.download_checkpoints()
@@ -52,6 +88,7 @@ class Driver:
 			# self.update_log_files(training_post_entities_blobs, operational_post_entities_blobs)
 		self.upload_checkpoints()
 
+	# TODO: This is all going to be removed (Since there is no Networked File System you can drop the internal logs)
 	def update_log_files(self, training_post_entities_blobs, operational_post_entities_blobs):
 		training_bucket_names = [blob.name.rsplit('/', 1)[0] for blob in training_post_entities_blobs]
 		operational_bucket_names = [blob.name.rsplit('/', 1)[0] for blob in operational_post_entities_blobs]
@@ -117,7 +154,7 @@ class Driver:
 
 			for post_entity in no_logo_post_entities:
 				image_bytes = no_logo_r2d2.get_image_with_path(post_entity['image_path'])
-				image = image_bytes #image = Image.open(io.BytesIO(image_bytes))
+				image = image_bytes 
 				print ("processing no logo image from ", post_entity['image_path'])
 				no_logo_images.append(image)
 			for post_entity in logo_post_entities:
@@ -140,7 +177,6 @@ class Driver:
 			self.checkpoint_controller.swap_out_checkpoints(self.checkpoint_directory+'/prev',self.checkpoint_directory)
 		print("Training completed for brand: ", brand)
 
-
 	def retrieve_supported_brands(self):
 		return self.input_controller.get_container_directories()
 
@@ -156,12 +192,18 @@ class Driver:
 			post_entities_list.append(ipe)
 		return post_entities_list
 
+	# TODO: These two will be gone because your Rest API will only return docs of unprocessed datasets using mongo find features
 	def retrieve_unproccessed_training_post_entities(self, brand_name):
 		return self.input_controller.download_brand_training_post_entities(brand_name, isProcessed = False)
 
 	def retrieve_unproccessed_operational_post_entities(self, brand_name):
 		return self.input_controller.download_brand_operational_post_entities(brand_name, isProcessed = False)
 
+'''
+	The idea of R2D2 was giving it a list of image paths,
+	batch download the calls efficiently and only load images when they are imediatly wanted for processing
+	I will make a copy of R2D2 below this to show what it should be for you
+'''
 class R2D2:
 	def __init__(self, input_controller):
 		self.input_controller = input_controller
@@ -183,8 +225,6 @@ class R2D2:
 		if(self.is_cache_empty() == True):
 			self.batch_download()
 		return self.get_blob_from_cache(full_blob_name)
-		# print "downloading image from path: " + full_blob_name
-		# return self.download_data(full_blob_name)
 
 	def get_blob_from_cache(self, full_blob_name):
 		blob = None
@@ -211,3 +251,75 @@ class R2D2:
 		self.current_index += len(paths)
 		if(len(paths) != 0):
 			self.cache.extend(self.input_controller.parallel_download(paths))
+
+# TODO: Fix The class below to fit yours while looking at the one above (test it in a seperate file)
+# Look at this https://www.codementor.io/aviaryan/downloading-files-from-urls-in-python-77q3bs0un
+class C3PO:
+	def __init__(self, mode = 'image_download'):	
+		if(mode == 'image_download'):
+			self.image_download_enabled = True
+
+	def reset(self):
+		self.current_index = 0
+		self.cache = []
+
+	def set_urls(self, urls, batch_size = 10):
+		self.urls = urls
+		self.batch_size = batch_size
+		self.reset()
+		self.batch_download()
+
+	def is_cache_empty(self):
+		return (len(self.cache) == 0)
+
+	def get_artifact_with_url(self, url):
+		if(self.is_cache_empty() == True):
+			self.batch_download()
+		return self.get_artifact_from_cache(url)
+
+	def get_artifact_from_cache(self, url):
+		blob = None
+		for index in range(len(self.cache)):
+			if(self.cache[index].name == full_blob_name):
+				print "blob with path: " + full_blob_name + " found in cache"
+				blob = self.cache[index].content
+				self.cache.pop(index)
+				break
+		if(blob == None):
+			blob = self.download_data(full_blob_name)
+			print "blob with path: " + full_blob_name + " NOT found in cache"
+		return blob
+
+	def download_data(self, full_blob_name):
+		return self.input_controller.download_data(full_blob_name)
+
+	def batch_download(self):
+		if(self.is_cache_empty() == False):
+			return
+		indices = [(self.current_index + i) for i in range(self.batch_size)]
+		paths = [self.image_paths[i] for i in indices if (i < len(self.image_paths))]
+		print "downloading next batch to cache..."
+		self.current_index += len(paths)
+		if(len(paths) != 0):
+			self.cache.extend(self.parallel_download(paths))
+	
+	def parallel_download(self, urls):
+		if(full_blob_names == None):
+			return None
+		threads = []
+		results = []
+		for full_blob_name in full_blob_names:
+			result = {'blob': None}
+			t = threading.Thread(target=self._download_blob_helper, args=(container_name,full_blob_name, result))
+			results.append(result)
+			threads.append(t)
+			t.start()
+		[t.join() for t in threads]
+		blobs = [result['blob'] for result in results if result['blob'] != None]
+		return blobs
+
+	def _download_blob_helper(self, container_name, full_blob_name, result):
+		if(self.exists(container_name, full_blob_name)):
+			result['blob'] = self.download_data(container_name, full_blob_name)
+		else:
+			return None
