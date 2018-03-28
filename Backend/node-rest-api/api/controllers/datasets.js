@@ -4,6 +4,8 @@ var PythonShell = require('python-shell');
 
 const fs = require('fs-extra');
 const uid = require('uid');
+const isImage = require('is-image');
+
 
 const Order = require('../models/order');
 const Product = require('../models/product');
@@ -16,8 +18,7 @@ function traverseDirectory(dirname, callback) {
     var output = [];
     fs.readdir(dirname, function(err, list) {
         // dirname = fs.realpathSync(dirname);
-        console.log('dirname: ' + dirname);
-
+        // console.log('dirname: ' + dirname);
         if (err) {
             return callback(err);
         }
@@ -25,10 +26,15 @@ function traverseDirectory(dirname, callback) {
         list.forEach(function(file) {
             outputname = file;
             // console.log(outputname);
+            // console.log("outputname is: " + outputname);
             file = dirname + file;
-            console.log(file);
+            // console.log("file is: " + file);
             fs.stat(file, function(err, stat) {
-                directory.push(file);
+                if (isImage(file)) {
+                    directory.push(file);
+                } else {
+                    file = file + "/";
+                }
                 output.push(outputname);
                 if (stat && stat.isDirectory()) {
                     traverseDirectory(file, function(err, parsed) {
@@ -199,6 +205,7 @@ exports.create_dataset = (req, res, next) => {
 }
 
 exports.fetch_dataset = (req, res, next) => {
+    var coverImage;
     console.log(req.userData.userId);
     const id = req.params.datasetId;
     Dataset.findById(id)
@@ -213,18 +220,35 @@ exports.fetch_dataset = (req, res, next) => {
             } else {
                 const folder = 'datasets/' + req.params.datasetId + '/'; //+ req.params.datasetId + '/';
                 traverseDirectory(folder, function(err, result) {
+                    console.log("traverseDirectory result is: " + result);
                     if (err) {
                         console.log(err);
+                        res.status(300).json({message: 'Dataset is empty'})
+                    }
+                    else if (result.length != 0) {
+                        coverImage = 'http://localhost:2000/' + result[0];
+                        res.status(200).json({
+                            dataset: dataset,
+                            cover: coverImage,
+                            images: result,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:2000/datasets/' + dataset._id
+                            }
+                        });
+                    } else {
+                        coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                        res.status(200).json({
+                            dataset: dataset,
+                            cover: coverImage,
+                            images: result,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:2000/datasets/' + dataset._id
+                            }
+                        });
                     }
                     // console.log(result);
-                    res.status(200).json({
-                        dataset: dataset,
-                        cover: 'http://localhost:2000/' + 'assets/noimages.png',
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:2000/datasets/' + dataset._id
-                        }
-                    });
                 });
             }
         })
