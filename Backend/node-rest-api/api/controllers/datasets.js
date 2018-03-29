@@ -76,8 +76,6 @@ exports.fetch_all_datasets = (req, res, next) => {
         .select('_id name')
         .exec() //turn it into a real promise
         .then(docs => {
-            
-
             console.log(docs);
             res.status(200).json({
                 count: docs.length,
@@ -381,7 +379,7 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
     Classifier.find({
         'parentDatasetId': req.params.datasetId
    })
-        .populate('classifiers', '_id name description trainingData')
+        .populate('classifiers', '_id name description parentDatasetId trainingData')
         .exec()
         .then(results => {
             if (results) {
@@ -395,7 +393,7 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
                             // nodes: classifier.nodes,
                             request: {
                                 type: 'GET',
-                                url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
+                                url: 'http://localhost:2000/datasets/'+doc.parentDatasetId+'/classifiers/' + doc._id //return list of classifiers
                                 //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
                             }
                         }
