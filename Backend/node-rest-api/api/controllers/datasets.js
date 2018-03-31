@@ -375,11 +375,9 @@ exports.create_classifier = (req, res, next) => {
 exports.fetch_dataset_classifiers = (req, res, next) => {
     const datasetId = req.params.datasetId;
     console.log("datasetId is ", datasetId);
-
-    Classifier.find({
-        'parentDatasetId': req.params.datasetId
-   })
-        .populate('classifiers', '_id name description parentDatasetId trainingData')
+    
+    Classifier.find({ 'parentDatasetId': req.params.datasetId })
+        .populate('classifiers', '_id userId name description parentDatasetId trainingData')
         .exec()
         .then(results => {
             if (results) {
@@ -393,7 +391,7 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
                             // nodes: classifier.nodes,
                             request: {
                                 type: 'GET',
-                                url: 'http://localhost:2000/datasets/'+doc.parentDatasetId+'/classifiers/' + doc._id //return list of classifiers
+                                url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
                                 //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
                             }
                         }
@@ -414,16 +412,20 @@ exports.fetch_classifier = (req, res, next) => {
     const classifierId = req.params.classifierId;
     console.log("classifierId is ", classifierId);
         Classifier.findById(classifierId)
-        .select('_id, name description')
+        .select('_id userId name description')
         .exec()
         .then(doc => {
             if (doc) {
-                res.status(200).json({
-                            id: doc._id,
-                            name: doc.name,
-                            description: doc.description,
-                            // nodes: classifier.nodes,
-                });
+                if (doc.userId == req.userData.userId) {
+                    res.status(404).json({message: 'classifier does not belong to user'});
+                } else {
+                    res.status(200).json({
+                        id: doc._id,
+                        name: doc.name,
+                        description: doc.description,
+                        // nodes: classifier.nodes,
+                    });
+                }
             } else {
                 res.status(404).json({message: 'No valid classifier found for provided ID'})
             }
@@ -433,6 +435,39 @@ exports.fetch_classifier = (req, res, next) => {
                 error: err
             });
         });
+}
+
+exports.create_category = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    console.log ("ASDF");
+
+    Classifier.findById(classifierId)
+        .select('_id userId parentDatasetId name nodes')
+        .exec()
+        .then(classifier => {
+            if (!classifier) {
+                return res.status(404).json({message: 'No classifier found for provided ID'})
+            } else if (classifier.userId != req.userData.userId) {
+                return res.status(404).json({message: 'Classifier doesn\'t belong to user'})
+            } else {
+                var node = {
+                    name: "test",
+                    index: "test",
+                    trainingData: [ "asdf" ]
+                };
+                classifier.nodes.push(node);
+                res.status(200).json({
+                    message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
+                    createdCategory: 'asdf' 
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });;
+    
 }
 
 exports.update_classifier = (req, res, next) => {
