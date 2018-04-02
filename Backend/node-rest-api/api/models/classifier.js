@@ -12,8 +12,9 @@ const classifierSchema = mongoose.Schema({
     classifierIndex: { type: String, required: true },
     nodes: [
         {
+            _id: mongoose.Schema.Types.ObjectId,
             name: { type: String, required: true },
-            index: { type: Number, required: true },
+            // index: { type: Number, required: true },
             trainingData: [ { type: String, required: true } ]
         }
     ]
