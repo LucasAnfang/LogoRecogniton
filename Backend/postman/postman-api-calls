@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "437d04dd-eddf-47d9-9d3a-c8f47eddafd1",
+		"_postman_id": "f470eaf5-aae9-4eca-961b-887c72fab886",
 		"name": "LogoRecognition API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -49,7 +49,10 @@
 				},
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "localhost:2000/datasets",
 					"host": [
@@ -147,12 +150,12 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDAxNzQ5LCJleHAiOjE1MjE0ODgxNDl9.DBav7B-idldoCDxupFW64uLXxu2HAebj-6W9z1YZcws",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIxNDk1MzgwLCJleHAiOjE1MjE1ODE3ODB9.DeoFrZ2BlBeUd0TjXX4J-e_dAwGA2cokXRzR48tDL3w",
 							"type": "string"
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -164,14 +167,15 @@
 					"raw": "{\n\t\"hashtag\": \"nike\"\n}"
 				},
 				"url": {
-					"raw": "localhost:2000/datasets/5aaedddcfef3b43e00e1dbd3",
+					"raw": "localhost:2000/datasets/5aaedddcfef3b43e00e1dbd3/scrape",
 					"host": [
 						"localhost"
 					],
 					"port": "2000",
 					"path": [
 						"datasets",
-						"5aaedddcfef3b43e00e1dbd3"
+						"5aaedddcfef3b43e00e1dbd3",
+						"scrape"
 					]
 				}
 			},
@@ -198,7 +202,6 @@
 						{
 							"key": "trainingImages",
 							"value": "",
-							"description": "",
 							"type": "file"
 						}
 					]
@@ -234,7 +237,10 @@
 				},
 				"method": "DELETE",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "localhost:2000/datasets/5aaee23aafad8c3f882ea123",
 					"host": [
@@ -362,6 +368,123 @@
 						"5aaf066db8563f4668fec1bd",
 						"classifiers",
 						"5aaf07b30cd04b46cec6630d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a category",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIyNjEzNDQyLCJleHAiOjE1MjI2OTk4NDJ9.6wAMWx3fOF7DcghQ_WYkUi00uf869fV9kkb38eZvVgA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"categoryname\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/datasets/5ab0852f9b918b627cc4cb9b/classifiers/5ac140c10c45965d95769dc9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5ab0852f9b918b627cc4cb9b",
+						"classifiers",
+						"5ac140c10c45965d95769dc9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a classifier (and the categories in it)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIyNjEzNDQyLCJleHAiOjE1MjI2OTk4NDJ9.6wAMWx3fOF7DcghQ_WYkUi00uf869fV9kkb38eZvVgA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:2000/datasets/5ab0852f9b918b627cc4cb9b/classifiers/5ac140c10c45965d95769dc9/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5ab0852f9b918b627cc4cb9b",
+						"classifiers",
+						"5ac140c10c45965d95769dc9",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Category (training data)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwidXNlcklkIjoiNWE5MGIzYzczNWUwNzNiYjc5MTYxNDcwIiwiaWF0IjoxNTIyNjEzNDQyLCJleHAiOjE1MjI2OTk4NDJ9.6wAMWx3fOF7DcghQ_WYkUi00uf869fV9kkb38eZvVgA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trainingData\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/datasets/5ab0852f9b918b627cc4cb9b/classifiers/5ac140c10c45965d95769dc9/5ac171e835f306665cfbc5b8",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"datasets",
+						"5ab0852f9b918b627cc4cb9b",
+						"classifiers",
+						"5ac140c10c45965d95769dc9",
+						"5ac171e835f306665cfbc5b8"
 					]
 				}
 			},
