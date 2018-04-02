@@ -387,10 +387,6 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
         res.status(400).json({ 
             error: "Dataset ID is not a valid ID"
         });
-    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
-        res.status(400).json({ 
-            error: "Classifier ID is not a valid ID"
-        });
     } else {
         Classifier.find({ 'parentDatasetId': req.params.datasetId })
             .populate('classifiers', '_id userId name description parentDatasetId trainingData')
@@ -711,6 +707,45 @@ exports.get_category = (req, res, next) => {
     }
 }
 
+exports.update_all_classifiers = (req, res, next) => {
+    const datasetId = req.params.datasetId;
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else {
+        Classifier.find({ 'parentDatasetId': req.params.datasetId })
+            .populate('classifiers', '_id userId name description parentDatasetId trainingData')
+            .exec()
+            .then(results => {
+                if (results) {
+                    res.status(200).json({
+                        count: results.length,
+                        classifier: results.map(doc => {
+                            return {
+                                id: doc._id,
+                                name: doc.name,
+                                description: doc.description,
+                                // nodes: classifier.nodes,
+                                request: {
+                                    type: 'GET',
+                                    url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
+                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    res.status(404).json({message: 'No valid entry found for provided ID'})
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error: err
+                });
+        });
+    }
+}
 exports.delete_category = (req, res, next) => {
     
 }
