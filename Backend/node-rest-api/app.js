@@ -10,6 +10,7 @@ const userRoutes = require('./api/routes/users');
 const classifierRoutes = require('./api/routes/classifiers');
 const datasetRoutes = require('./api/routes/datasets');
 const scraperRoutes = require('./api/routes/scraper');
+const tensorflowRoutes = require('./api/routes/tensorflow');
 
 mongoose.connect(
     'mongodb://logo_detection_dev:' + process.env.MONGO_ATLAS_PW + '@logo-detection-c0-shard-00-00-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-01-swlr9.mongodb.net:27017,logo-detection-c0-shard-00-02-swlr9.mongodb.net:27017/LogoDetection?ssl=true&replicaSet=logo-detection-c0-shard-0&authSource=admin'
@@ -47,6 +48,7 @@ app.use('/users', userRoutes);
 app.use('/classifiers', classifierRoutes);
 app.use('/datasets', datasetRoutes);
 app.use('/scraper', scraperRoutes);
+app.use('/tensorflow', tensorflowRoutes)
 
 app.use((req, res, next) => {
     const error = new Error('Not found');

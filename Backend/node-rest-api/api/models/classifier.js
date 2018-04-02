@@ -10,6 +10,7 @@ const classifierSchema = mongoose.Schema({
     isPublic: { type: Boolean, default: false },
     // index for tensorflow
     classifierIndex: { type: String, required: true },
+    processed: {type: Boolean, default: false},
     nodes: [
         {
             _id: mongoose.Schema.Types.ObjectId,
