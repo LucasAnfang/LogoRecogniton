@@ -737,46 +737,37 @@ exports.update_all_classifiers = (req, res, next) => {
     }
 }
 exports.delete_category = (req, res, next) => {
-    var id = req.params.classifierId;
-    var uid = req.userData.userId;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    const classifierId = req.params.classifierId;
+    const datasetId = req.params.datasetId;
+    const categoryId = req.params.categoryId;
+    
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
         res.status(400).json({ 
             error: "Classifier ID is not a valid ID"
         });
+    } else if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+        res.status(400).json({ 
+            error: "Category ID is not a valid ID"
+        });
     } else {
-        
-        Classifier.findOne({ _id: id}, function (err, docs){
-            // need to fix error codes
-            if (docs) {
-                if (docs.userId != uid) {
-                    res.status(400).json({ 
-                        error: "Classifier doesn't belong to user"
-                    });
-                } else {
-                    Classifier.remove({ _id: id, userId: uid })
-                        .exec()
-                        .then(result => {
-                            res.status(200).json({
-                                message: 'Classifier Deleted',
-                                request: {
-                                    type: 'POST',
-                                    url: 'http://localhost:2000/datasets'
-                                }
-                            });
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            res.status(500).json({ 
-                                error: err
-                            });
-                        });
-                }
-            } else {
-                res.status(400).json({ 
-                    error: "Classifier doesn't exist"
+        Classifier.findByIdAndUpdate(
+            req.params.classifierId, 
+            { $pull: { "nodes": { _id: mongoose.Types.ObjectId(req.params.categoryId) } } }, 
+            { safe: true, upsert: true })
+            .exec()
+            .then(result => {
+                res.status(200).json({
+                    result: result
                 });
-            }
-        }); 
+            })
+            .catch(err => {
+                res.status(500).json({
+                    err: err
+                });
+            });
     }
 }
