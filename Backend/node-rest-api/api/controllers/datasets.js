@@ -737,5 +737,46 @@ exports.update_all_classifiers = (req, res, next) => {
     }
 }
 exports.delete_category = (req, res, next) => {
-    
+    var id = req.params.classifierId;
+    var uid = req.userData.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else {
+        
+        Classifier.findOne({ _id: id}, function (err, docs){
+            // need to fix error codes
+            if (docs) {
+                if (docs.userId != uid) {
+                    res.status(400).json({ 
+                        error: "Classifier doesn't belong to user"
+                    });
+                } else {
+                    Classifier.remove({ _id: id, userId: uid })
+                        .exec()
+                        .then(result => {
+                            res.status(200).json({
+                                message: 'Classifier Deleted',
+                                request: {
+                                    type: 'POST',
+                                    url: 'http://localhost:2000/datasets'
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.status(500).json({ 
+                                error: err
+                            });
+                        });
+                }
+            } else {
+                res.status(400).json({ 
+                    error: "Classifier doesn't exist"
+                });
+            }
+        }); 
+    }
 }
