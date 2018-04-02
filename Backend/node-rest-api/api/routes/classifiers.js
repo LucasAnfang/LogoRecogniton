@@ -4,6 +4,6 @@ const checkAuth = require('../middleware/check-auth');
 
 const ClassifierController = require('../controllers/classifiers');
 
-router.get('/', checkAuth, ClassifierController.fetch_all_classifiers);
+router.post('/', checkAuth, ClassifierController.fetch_all_classifiers);
 
 module.exports = router;
