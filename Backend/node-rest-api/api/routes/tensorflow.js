@@ -4,6 +4,6 @@ const checkAuth = require('../middleware/check-auth');
 
 const TensorflowController = require('../controllers/tensorflow');
 
-// router.get('/', checkAuth, ClassifierController.fetch_all_classifiers);
+router.get('/training', checkAuth, TensorflowController.fetch_new_batches);
 
 module.exports = router;
