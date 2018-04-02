@@ -389,7 +389,7 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
         });
     } else {
         Classifier.find({ 'parentDatasetId': req.params.datasetId })
-            .populate('classifiers', '_id userId name description parentDatasetId trainingData')
+            .populate('classifiers', '_id userId name description parentDatasetId status trainingData')
             .exec()
             .then(results => {
                 if (results) {
@@ -400,6 +400,7 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
                                 id: doc._id,
                                 name: doc.name,
                                 description: doc.description,
+                                status: doc.status,
                                 // nodes: classifier.nodes,
                                 request: {
                                     type: 'GET',
@@ -714,36 +715,25 @@ exports.update_all_classifiers = (req, res, next) => {
             error: "Dataset ID is not a valid ID"
         });
     } else {
-        Classifier.find({ 'parentDatasetId': req.params.datasetId })
-            .populate('classifiers', '_id userId name description parentDatasetId trainingData')
+        Classifier.find({parentDatasetId: datasetId})
             .exec()
             .then(results => {
-                if (results) {
+                if (results.length != 0) { 
+                    results.forEach(item => {
+                        Classifier.update(
+                            { _id: item._id }, 
+                            { $set: {"status": 1}}
+                        )
+                        .exec();
+                    });
                     res.status(200).json({
-                        count: results.length,
-                        classifier: results.map(doc => {
-                            return {
-                                id: doc._id,
-                                name: doc.name,
-                                description: doc.description,
-                                // nodes: classifier.nodes,
-                                request: {
-                                    type: 'GET',
-                                    url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
-                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
-                                }
-                            }
-                        })
+                        message: "Updated status to completed (1) for all classifiers in dataset"
                     });
                 } else {
-                    res.status(404).json({message: 'No valid entry found for provided ID'})
+                    res.status(404).json({message: 'No classifiers found for provided ID'})
                 }
             })
-            .catch(err => {
-                res.status(500).json({
-                    error: err
-                });
-        });
+                    
     }
 }
 exports.delete_category = (req, res, next) => {
