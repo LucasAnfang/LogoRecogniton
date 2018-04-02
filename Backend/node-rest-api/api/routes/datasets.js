@@ -49,9 +49,9 @@ router.delete('/:datasetId/classifiers/:classifierId', checkAuth, DatasetControl
 
 //category routes
 router.post('/:datasetId/classifiers/:classifierId', checkAuth, DatasetController.create_category);
-// router.get('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.get_category_training_data);
+router.get('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.get_category);
 // use patch to update training data for the category
-// router.patch('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.update_classifier);
-// router.delete('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.delete_classifier);
+router.patch('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.update_category);
+router.delete('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.delete_category);
 
 module.exports = router;

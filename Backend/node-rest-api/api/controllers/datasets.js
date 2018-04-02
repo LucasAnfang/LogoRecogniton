@@ -266,8 +266,7 @@ exports.delete_dataset = (req, res, next) => {
         res.status(400).json({ 
             error: "DatasetID is not a valid ID"
         });
-    }
-    else {
+    } else {
         deleteFolderRecursive('datasets/'+id);
         
         Dataset.findOne({ _id: id}, function (err, docs){
@@ -313,117 +312,160 @@ exports.delete_dataset = (req, res, next) => {
 // classifiers
 exports.create_classifier = (req, res, next) => {
 
+    const classifierId = req.params.classifierId;
     const datasetId = req.params.datasetId;
-    console.log(datasetId);
-    Dataset.findById(datasetId)
-        .select('_id userId classifiers')
-        .exec()
-        .then(dataset => {
-            if (!dataset) {
-                return res.status(404).json({message: 'No dataset found for provided ID'})
-            } else if (dataset.userId != req.userData.userId) {
-                return res.status(404).json({message: 'Dataset doesn\'t belong to user'})
-            } else {
-                const classifier = new Classifier({
-                    _id: new mongoose.Types.ObjectId(),
-                    name: req.body.name,
-                    userId: req.userData.userId,
-                    parentDatasetId: datasetId,
-                    description: req.body.description,
-                    // need to figure out how to get these two automatically
-                    classifierIndex: '0',
-                    nodes: []
-                });
 
-                classifier.save()
-                    .then(result => {
-                        console.log("adding to the dataset");
-                        dataset.classifiers.push(classifier._id);
-                        dataset.save();
-                        console.log("size is " , dataset.classifiers.length)
-
-                        console.log(result);
-                        console.log("name is ", result.name);
-                        return res.status(200).json({
-                            message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
-                            createdClassifier: 
-                            {
-                                classifierId: result._id,
-                                name: result.name,
-                                description: result.description,
-                                userId: result.userId,
-                                isPublic: result.isPublic,
-                                parentDatasetId: result.parentDatasetId,
-                                request: {
-                                    type: 'GET',
-                                    url: 'http://localhost:2000/datasets/'+ result.parentDatasetId+'classifiers/' + result._id
-                                }
-                            }
-                        });
-
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(500).json({ 
-                            error: err 
-                        });
-                    });
-            }
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
         });
+    } else {
+        console.log(datasetId);
+        Dataset.findById(datasetId)
+            .select('_id userId classifiers')
+            .exec()
+            .then(dataset => {
+                if (!dataset) {
+                    return res.status(404).json({message: 'No dataset found for provided ID'})
+                } else if (dataset.userId != req.userData.userId) {
+                    return res.status(404).json({message: 'Dataset doesn\'t belong to user'})
+                } else {
+                    const classifier = new Classifier({
+                        _id: new mongoose.Types.ObjectId(),
+                        name: req.body.name,
+                        userId: req.userData.userId,
+                        parentDatasetId: datasetId,
+                        description: req.body.description,
+                        // need to figure out how to get these two automatically
+                        classifierIndex: '0',
+                        nodes: []
+                    });
+
+                    classifier.save()
+                        .then(result => {
+                            console.log("adding to the dataset");
+                            dataset.classifiers.push(classifier._id);
+                            dataset.save();
+                            console.log("size is " , dataset.classifiers.length)
+
+                            console.log(result);
+                            console.log("name is ", result.name);
+                            return res.status(200).json({
+                                message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
+                                createdClassifier: 
+                                {
+                                    classifierId: result._id,
+                                    name: result.name,
+                                    description: result.description,
+                                    userId: result.userId,
+                                    isPublic: result.isPublic,
+                                    parentDatasetId: result.parentDatasetId,
+                                    request: {
+                                        type: 'GET',
+                                        url: 'http://localhost:2000/datasets/'+ result.parentDatasetId+'classifiers/' + result._id
+                                    }
+                                }
+                            });
+
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.status(500).json({ 
+                                error: err 
+                            });
+                        });
+                }
+        });
+    }
 }
 
 exports.fetch_dataset_classifiers = (req, res, next) => {
+    const classifierId = req.params.classifierId;
     const datasetId = req.params.datasetId;
-    console.log("datasetId is ", datasetId);
-    
-    Classifier.find({ 'parentDatasetId': req.params.datasetId })
-        .populate('classifiers', '_id userId name description parentDatasetId trainingData')
-        .exec()
-        .then(results => {
-            if (results) {
-                res.status(200).json({
-                    count: results.length,
-                    classifier: results.map(doc => {
-                        return {
-                            id: doc._id,
-                            name: doc.name,
-                            description: doc.description,
-                            // nodes: classifier.nodes,
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
-                                //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
-                            }
-                        }
-                    })
-                });
-            } else {
-                res.status(404).json({message: 'No valid entry found for provided ID'})
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                error: err
-            });
+
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
         });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else {
+        Classifier.find({ 'parentDatasetId': req.params.datasetId })
+            .populate('classifiers', '_id userId name description parentDatasetId trainingData')
+            .exec()
+            .then(results => {
+                if (results) {
+                    res.status(200).json({
+                        count: results.length,
+                        classifier: results.map(doc => {
+                            return {
+                                id: doc._id,
+                                name: doc.name,
+                                description: doc.description,
+                                // nodes: classifier.nodes,
+                                request: {
+                                    type: 'GET',
+                                    url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
+                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    res.status(404).json({message: 'No valid entry found for provided ID'})
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error: err
+                });
+        });
+    }
 }
 
 exports.fetch_classifier = (req, res, next) => {
     const classifierId = req.params.classifierId;
-    console.log("classifierId is ", classifierId);
+    const datasetId = req.params.datasetId;
+
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else {
+        console.log("classifierId is ", classifierId);
         Classifier.findById(classifierId)
-        .select('_id userId name description')
+        .select('_id userId name nodes description')
+        // .populate('nodes')
         .exec()
         .then(doc => {
             if (doc) {
-                if (doc.userId == req.userData.userId) {
+                if (doc.userId != req.userData.userId) {
+                    console.log (doc.userId);
+                    console.log (req.userData.userId);
                     res.status(404).json({message: 'classifier does not belong to user'});
                 } else {
                     res.status(200).json({
                         id: doc._id,
                         name: doc.name,
                         description: doc.description,
-                        // nodes: classifier.nodes,
+                        categories: doc.nodes.map(nodes => {
+                            return {
+                                categoryId: nodes._id,
+                                name: nodes.name,
+                                // trainingData: nodes.trainingData,
+                                request: {
+                                    type: 'GET',
+                                    url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id + '/' + nodes._id //return list of classifiers
+                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
+                                }
+                            }
+                        }),
                     });
                 }
             } else {
@@ -435,69 +477,9 @@ exports.fetch_classifier = (req, res, next) => {
                 error: err
             });
         });
-}
-
-exports.create_category = (req, res, next) => {
-    const classifierId = req.params.classifierId;
-    console.log ("ASDF");
-
-    Classifier.findById(classifierId)
-        .select('_id userId parentDatasetId name nodes')
-        .exec()
-        .then(classifier => {
-            if (!classifier) {
-                return res.status(404).json({message: 'No classifier found for provided ID'})
-            } else if (classifier.userId != req.userData.userId) {
-                return res.status(404).json({message: 'Classifier doesn\'t belong to user'})
-            } else {
-                var node = {
-                    name: "test",
-                    index: "test",
-                    trainingData: [ "asdf" ]
-                };
-                classifier.nodes.push(node);
-                res.status(200).json({
-                    message: 'Handling POST request to /datasets/' + req.params.datasetId + '/classifiers',
-                    createdCategory: 'asdf' 
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                error: err
-            });
-        });;
-    
-}
-
-exports.update_classifier = (req, res, next) => {
-    const classifierId = req.params.classifierId;
-    // const classifier = Classifier.findById(classifierId);
-    // const parent = classifier.parentDatasetId;
-    const updateOps = {};
-    for (const ops of Array.from(req.body)) {
-        updateOps[ops.propName] = ops.value;
     }
-    Classifier.update({ _id: classifierId }, { $set: updateOps}) 
-        .exec()
-        .then(result => {
-            console.log(result);
-            res.status(200).json({
-                message: 'Classifier updated',
-                request: {
-                    type: 'GET',
-                    // url: 'http://localhost:3000/datasets/' + parentDatasetId + '/classifiers/' + classifierId
-                }
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ 
-                error: err 
-            });
-        });   
-            
 }
+
 
 exports.delete_classifier = (req, res, next) => {
     var id = req.params.classifierId;
@@ -507,8 +489,7 @@ exports.delete_classifier = (req, res, next) => {
         res.status(400).json({ 
             error: "Classifier ID is not a valid ID"
         });
-    }
-    else {
+    } else {
         
         Classifier.findOne({ _id: id}, function (err, docs){
             // need to fix error codes
@@ -543,4 +524,193 @@ exports.delete_classifier = (req, res, next) => {
             }
         }); 
     }
+}
+
+
+exports.create_category = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    const datasetId = req.params.datasetId;
+
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else {
+        var newnode = { 
+            _id: new mongoose.Types.ObjectId(), 
+            name: req.body.name, 
+            trainingData: []
+        }
+
+        Classifier.findOneAndUpdate(
+            { userId: req.userData.userId, _id: req.params.classifierId, parentDatasetId: req.params.datasetId }, 
+            {$push: {"nodes": newnode}}, 
+            {safe: true, new: true}
+            )
+            .exec()
+            .then(docs => {
+                if (docs) {
+                    res.status(200).json({
+                        message: "Succesfully created classifier",
+                        doc: docs.nodes.map(nodes => {
+                            return {
+                                categoryId: nodes._id,
+                                name: nodes.name,
+                                // trainingData: nodes.trainingData,
+                                request: {
+                                    type: 'GET',
+                                    url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + docs._id + '/' + nodes._id //return list of classifiers
+                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
+                                }
+                            }
+                        })
+                    });
+                } else {
+                    res.status(404).json({
+                        message: "Couldn't find classifier"
+                    })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    err: err
+                });
+            }); 
+    } 
+}
+
+exports.update_category = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    const datasetId = req.params.datasetId;
+    const categoryId = req.params.categoryId;
+
+    console.log("updating");
+
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+        res.status(400).json({ 
+            error: "Category ID is not a valid ID"
+        });
+    } else {
+        Classifier.findOneAndUpdate(
+            {
+                "_id": mongoose.Types.ObjectId(classifierId),
+                "userId": mongoose.Types.ObjectId(req.userData.userId), 
+                "parentDatasetId": mongoose.Types.ObjectId(datasetId),
+                "nodes._id": mongoose.Types.ObjectId(categoryId) 
+            },
+            { $set: { "nodes.$.trainingData": req.body.trainingData}}, 
+            { safe: true, new: true }
+        )
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: "Updated training data",
+                trainingData: result.nodes[0].trainingData
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err
+            });
+        });
+    }
+    // const classifier = Classifier.findById(classifierId);
+        // const parent = classifier.parentDatasetId;
+        // const updateOps = {};
+        // for (const ops of Array.from(req.body)) {
+        //     updateOps[ops.propName] = ops.value;
+        // }
+        // Classifier.update({ _id: classifierId }, { $set: updateOps}) 
+        //     .exec()
+        //     .then(result => {
+        //         console.log(result);
+        //         res.status(200).json({
+        //             message: 'Classifier updated',
+        //             request: {
+        //                 type: 'GET',
+        //                 // url: 'http://localhost:3000/datasets/' + parentDatasetId + '/classifiers/' + classifierId
+        //             }
+        //         });
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //         res.status(500).json({ 
+        //             error: err 
+        //         });
+        //     });   
+    // }
+}
+
+exports.get_category = (req, res, next) => {
+    const classifierId = req.params.classifierId;
+    const datasetId = req.params.datasetId;
+    const categoryId = req.params.categoryId;
+    
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(classifierId)) {
+        res.status(400).json({ 
+            error: "Classifier ID is not a valid ID"
+        });
+    } else if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+        res.status(400).json({ 
+            error: "Category ID is not a valid ID"
+        });
+    } else if (!req.body.name) {
+        res.status(500).json({
+            error: "Must provide category name"
+        });
+    } else {
+        Classifier.findOne(
+            {
+                "_id": mongoose.Types.ObjectId(classifierId),
+                "userId": mongoose.Types.ObjectId(req.userData.userId), 
+                "parentDatasetId": mongoose.Types.ObjectId(datasetId)
+            },
+            { 
+                nodes: { 
+                    $elemMatch: { 
+                        _id: mongoose.Types.ObjectId(categoryId) 
+                    } 
+                } 
+            }
+        )
+        .exec()
+        .then(result => {
+            if (result) {
+                res.status(200).json({
+                    categoryId: result.nodes[0]._id,
+                    name: result.nodes[0].name,
+                    trainingData: result.nodes[0].trainingData
+                });
+            } else {
+                res.status(400).json({
+                    message: "Couldn't find category"
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err
+            });
+        });
+    }
+}
+
+exports.delete_category = (req, res, next) => {
+    
 }
