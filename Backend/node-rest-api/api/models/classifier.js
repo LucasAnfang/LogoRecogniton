@@ -15,7 +15,7 @@ const classifierSchema = mongoose.Schema({
     // 1 = ready to be trained
     // 2 = processing
     // 3 = finished processing
-    status: { type: Number, default: 0},
+    status: { type: Number, default: 0 },
     nodes: [
         {
             _id: mongoose.Schema.Types.ObjectId,

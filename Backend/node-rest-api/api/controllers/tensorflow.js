@@ -29,7 +29,8 @@ exports.fetch_new_batches_and_set = (req, res, next) => {
         results.forEach(item => {
             Classifier.update(
                 {_id: item._id},
-                { $set: {"status": 2 }},
+                // { $set: {"status": 2 }}, 
+                { $set: {"status": 1 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
         });
@@ -39,21 +40,10 @@ exports.fetch_new_batches_and_set = (req, res, next) => {
             err: err
         });
     });
-    // Classifier.update( 
-    //     { status: 2 }, 
-    //     { $set: { status: 1 } },
-    //     { safe: true, multi: true }
-    // )
-    // .exec()
-    // .then(results => {
-    //     console.log(results);
-    //     res.status(200).json({
-    //         results: results
-    //     });
-    // })
-    // .catch(err => {
-    //     res.status(500).json({
-    //         err: err
-    //     });
-    // });
+}
+
+exports.store_results = (req, res, next) => {
+}
+
+exports.store_checkpoints = (req, res, next) => {
 }

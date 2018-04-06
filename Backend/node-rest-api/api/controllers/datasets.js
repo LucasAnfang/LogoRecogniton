@@ -667,10 +667,6 @@ exports.get_category = (req, res, next) => {
         res.status(400).json({ 
             error: "Category ID is not a valid ID"
         });
-    } else if (!req.body.name) {
-        res.status(500).json({
-            error: "Must provide category name"
-        });
     } else {
         Classifier.findOne(
             {
@@ -722,7 +718,8 @@ exports.update_all_classifiers = (req, res, next) => {
                     results.forEach(item => {
                         Classifier.update(
                             { _id: item._id }, 
-                            { $set: {"status": 1}}
+                            { $set: {"status": 1}},
+                            { safe: true, new: true, multi: true }
                         )
                         .exec();
                     });
