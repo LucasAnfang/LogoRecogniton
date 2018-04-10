@@ -221,8 +221,8 @@ exports.fetch_dataset = (req, res, next) => {
     console.log(req.userData.userId);
     const id = req.params.datasetId;
     Dataset.findById(id)
-        .select('_id userId name isProcessed classifiers datasetType')
-        // .populate('uploadRequest', 'data')
+        .select('_id userId images name isProcessed classifiers datasetType')
+        .populate('images', 'url')
         .exec()
         .then(dataset => {
             if (!dataset) {
