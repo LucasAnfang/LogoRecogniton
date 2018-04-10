@@ -13,7 +13,7 @@ from PIL import Image
 
 import tensorflow as tf
 
-from datasets import dataset_utils
+# from datasets import dataset_utils
 
 
 class ImageReader(object):
@@ -57,7 +57,8 @@ def write_tfrecord(database_dir,images, labels, name):
     raise ValueError("Images size %d does not match label size %d." %
                      (len(images), num_examples))
 
-  filename = os.path.join(database_dir, name)
+  # filename = os.path.join(database_dir, name)
+  filename = os.path.abspath(os.path.join(database_dir, name))
   print('Writing', filename)
   writer = tf.python_io.TFRecordWriter(filename)
   for index in range(num_examples):
@@ -66,13 +67,13 @@ def write_tfrecord(database_dir,images, labels, name):
       with tf.Session('') as sess:
         width, height = image_reader.read_image_dims(sess, images[index])
         image_raw = images[index]
-        example = image_to_tfexample(image_raw, 'jpeg', height, width, int(labels[index]))
+        example = image_to_tfexample(image_raw, str.encode('jpeg'), height, width, int(labels[index]))
         writer.write(example.SerializeToString())
 
 def convert_to(database_dir,images, labels):
     _NUM_VALIDATION = int(len(labels)*.2+1)
     _RANDOM_SEED = 0
-    _NUM_SHARDS = 5
+    _NUM_SHARDS = 5 #?
     images = np.array(images)
     labels = np.array(labels)
     c = np.c_[images.reshape(len(images), -1), labels.reshape(len(labels), -1)]

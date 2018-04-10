@@ -1,12 +1,18 @@
 import os
 import sys
 import shutil
-sys.path.append(os.path.join(os.path.dirname(__file__),'../../../..'))
-from src.implementation.storage_controller.Entities.log_entries_base import LogEntriesBase
-from src.implementation.storage_controller.Entities.input_log_entries import InputLogEntries
-from src.implementation.storage_controller.Entities.instagram_post_entity import InstagramPostEntities
+
+
+sys.path.append(os.path.join(os.path.dirname(__file__),'../Entities'))
+sys.path.append(os.path.join(os.path.dirname(__file__),'../NetworkedFileSystem'))
+
 from nfs_controller_config import NFS_Controller_Config
 from nfs_controller import NFS_Controller
+
+
+from log_entries_base import LogEntriesBase
+from input_log_entries import InputLogEntries
+from instagram_post_entity import InstagramPostEntities
 import uuid
 import datetime
 
@@ -61,7 +67,7 @@ class CheckpointController:
 
 	""" Download """
 	def download_checkpoints(self, destination_directory = None):
-		print "download checkpoints " + destination_directory
+		print( "download checkpoints " + destination_directory)
 		self.nfs_controller.download_full_container(self._checkpoint_container(), destination_directory = destination_directory)
 
 	def parallel_download(self, full_blob_names):

@@ -5,7 +5,7 @@ const datasetSchema = mongoose.Schema({
     name: { type: String, required: true },
     userId: {  type: String, required: true },
     isProcessed: { type: Boolean, default: false },
-    classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ],
+    classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Classifiers'} ],
     uploadRequest: { 
         configuration: {
             // classifiers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Dataset'} ]
@@ -17,11 +17,7 @@ const datasetSchema = mongoose.Schema({
     // training/ops
     datasetType: { type: Number, required: true },
     images: [
-        {
-            _id: mongoose.Schema.Types.ObjectId,
-            url: { type: String, required: true,
-            results: [{ type: String}] }
-        }
+        { type: mongoose.Schema.Types.ObjectId, ref: 'ImageObj'}
     ]
 });
 

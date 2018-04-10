@@ -1,7 +1,10 @@
 import numpy as np
 import os
 import tensorflow as tf
-import urllib2
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 import image_utils
 
 from datasets import my_dataset
@@ -19,7 +22,7 @@ def classify(checkpoints_dir, images,logo_names=[""], reuse=False):
     output_probabilities = []
     for image in images:
         image = tf.image.decode_jpeg(image, channels=3)
-        #image = tf.image.resize_image_with_crop_or_pad(image, 299, 299)
+        image = tf.image.resize_image_with_crop_or_pad(image, 600, 600)
         processed_image = inception_preprocessing.preprocess_image(image,
                                                              image_size,
                                                              image_size,
@@ -51,47 +54,48 @@ def classify(checkpoints_dir, images,logo_names=[""], reuse=False):
                                              processed_image_list]
                                              + probabilities)[2:]
         output_dict = {}
-        print "range(len(output_probabilities): ", range(len(output_probabilities))
+        print("range(len(output_probabilities): ", range(len(output_probabilities)))
         for index in range(len(output_probabilities)):
-            print 'logo_names[index]:[{}]'.format(logo_names[index])
+            print( 'logo_names[index]:[{}]'.format(logo_names[index]))
             print('type logo_names[index]',type(logo_names[index]));
             if logo_names[index] == "":
-                print "here???????????????????"
+                print("here???????????????????")
                 output_dict [logo_names[index]] = output_probabilities[index]
             else:
                 output_dict [logo_names[index]] = output_probabilities[index]
-            print "output_dict [""]: ", output_dict [""].shape
+            print ("output_dict [""]: ", output_dict [""].shape)
 
-        print "final 0,780 prob output_dict [""]: ", output_dict[""][0][780];
+        print ("final 0,780 prob output_dict [""]: ", output_dict[""][0][780]);
         output_dict[""] = np.argsort(output_dict[""], axis=1)[:, ::-1][:, :5]
-        print "final output_dict [""]: ", output_dict [""]
+        # print ("final output_dict [""]: ", output_dict [""])
         return output_dict
-'''def main(_):
+
+def setup_then_classify(input_folder):
     images = []
     nameMap = []
     indexMap = []
     classMap = {}
-    with open("class_list.txt", "r") as ins:
+    with open("../../models/class_list.txt", "r") as ins:
         for line in ins:
             nameMap.append(line.split('\n')[0])
-    with open("imagenet_lsvrc_2015_synsets.txt", "r") as ins:
+    with open("../../models/imagenet_lsvrc_2015_synsets.txt", "r") as ins:
         index = 0
         for line in ins:
             indexMap.append(line.split('\n')[0])
-    with open("imagenet_metadata.txt", "r") as ins:
+    with open("../../models/imagenet_metadata.txt", "r") as ins:
         for line in ins:
             word = line.split()
             classMap[word[0]] = word[1]
     #node_lookup = image_utils.NodeLookup()
-    for filename in os.listdir('../../resources/results/Patagonia'):
-        image = os.path.join('../../resources/results/Patagonia', filename)
-        print "filename:", image
+    for filename in os.listdir(input_folder):
+        image = os.path.join(input_folder, filename)
+        print ("filename:", image)
 
         images.append(tf.read_file(image))
-    results = classify("../../resources/checkpoints/inception_v4.ckpt",images,logo_names=[""])
+    results = classify("../../../resources/checkpoints/inception_v4.ckpt",images,logo_names=[""])
     for index in range(len(image)):
-            print np.shape(results[""][index])
-            print "setup: ",results[""][index][0]-1,"is ->",nameMap[results[""][index][0]-1]
+            print (np.shape(results[""][index]))
+            print ("setup: ",results[""][index][0]-1,"is ->",nameMap[results[""][index][0]-1])
             a = [ nameMap[node_id-1] for node_id in results[""][index]]
             print('class for image ', index,': ', a)
-main(None)'''
+# main(None)

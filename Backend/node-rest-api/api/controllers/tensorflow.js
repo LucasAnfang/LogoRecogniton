@@ -67,7 +67,7 @@ exports.store_checkpoints = (req,res,next) => {
     
 // }
 
-exports.fetch_new_batches_and_set = (req, res, next) => {
+exports.fetch_training_batches_and_set = (req, res, next) => {
     // find all classifiers with status 1, ready to be trained
     // set all classifiers with status 1 to 2, processing
     Classifier.find(
@@ -107,9 +107,13 @@ exports.fetch_new_batches_and_set = (req, res, next) => {
     });
 }
 
+exports.store_checkpoints = (req, res, next) => {}
+
+exports.store_accuracy = (req, res, next) => {
+
+}
+
 exports.store_results = (req, res, next) => {
-}
-
-exports.store_checkpoints = (req, res, next) => {
 
 }
+

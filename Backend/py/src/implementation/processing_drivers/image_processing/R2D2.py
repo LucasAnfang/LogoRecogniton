@@ -12,7 +12,7 @@ class R2D2:
 		targets: routes to hit off the base url
 		mode: what is the content and download method
 	'''
-	def __init__(self, base_url, targets, batch_size = 10, mode = 'image_download'):
+	def __init__(self, base_url, targets, batch_size = 10, mode = 'image_download'):	
 		if(mode == 'image_download'):
 			self.image_download_enabled = True
 
@@ -27,6 +27,8 @@ class R2D2:
 
 	def start(self):
 		self.batch_download()
+
+	def set_output():
 
 
 	def _is_cache_empty(self):
@@ -65,7 +67,7 @@ class R2D2:
 		self.current_index += len(paths)
 		if(len(paths) != 0):
 			self.cache.extend(self.parallel_download(paths))
-
+	
 	def parallel_download(self, urls):
 		if(full_blob_names == None):
 			return None
@@ -73,8 +75,7 @@ class R2D2:
 		results = []
 		for full_blob_name in full_blob_names:
 			result =  None
-			t = threading.Thread(target=self._download_blob_helper,
-					args=(self.base_url, base_dir, image_path, result))
+			t = threading.Thread(target=self._download_blob_helper, args=(self.base_url, base_dir, image_path, result))
 			results.append(result)
 			threads.append(t)
 			t.start()
@@ -98,10 +99,13 @@ class R2D2:
 		del response
 		result = result_path
 
-# def main():
-# 	base_url = "http://localhost:2000"
-# 	image_paths = ["images/21mwvg4/patagonia/27891041_513296255732070_8569826624566984704_n.jpg"]
-# 	print("Hi!")
-#
-# if __name__ == '__main__':
-#   main()
+def main():
+	base_url = "http://localhost:2000"
+	image_paths = ["images/21mwvg4/patagonia/27891041_513296255732070_8569826624566984704_n.jpg"]
+	print("Hi!")
+
+if __name__ == '__main__':
+  main()
+
+  #krk rocket 5
+

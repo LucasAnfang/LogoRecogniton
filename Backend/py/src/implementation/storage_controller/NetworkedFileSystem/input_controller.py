@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__),'../../../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__),'../../../../../'))
 from src.implementation.storage_controller.Entities.log_entries_base import LogEntriesBase
 from src.implementation.storage_controller.Entities.input_log_entries import InputLogEntries
 from src.implementation.storage_controller.Entities.instagram_post_entity import InstagramPostEntities
@@ -46,7 +46,7 @@ class InputController:
 		bucket_path = self._create_path_to_bucket(brand, self.constants.TRAINING_DIRECTORY_NAME)
 		bucket_post_entities_full_path = self._get_bucket_post_entities_file(bucket_path)
 		bucket_images_base_path = self._get_bucket_image_directory(bucket_path)
-		print 'bucket_path: {}\nbucket_post_entities_full_path: {}\nbucket_images_base_path: {}\n'.format(bucket_path, bucket_post_entities_full_path, bucket_images_base_path)
+		print ('bucket_path: {}\nbucket_post_entities_full_path: {}\nbucket_images_base_path: {}\n'.format(bucket_path, bucket_post_entities_full_path, bucket_images_base_path))
 		self.nfs_controller.batched_parallel_directory_upload(self._input_container(), bucket_images_base_path, logo_dir)
 		self.nfs_controller.batched_parallel_directory_upload(self._input_container(), bucket_images_base_path, no_logo_dir)
 		for element in IPE.posts:
@@ -88,7 +88,7 @@ class InputController:
 		container_name = self._input_container()
 		logs = self.retrieve_log_entities(prefix, isProcessed = isProcessed, paths_only = True)
 		for log in logs:
-			print log
+			print (log)
 			blobs.append(self.nfs_controller.download_data(container_name, '{}/{}'.format(log, 'post_entities.txt')))
 		return blobs
 

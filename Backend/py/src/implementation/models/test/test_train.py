@@ -8,7 +8,7 @@ from nets import inception
 from nets import inception_utils
 from preprocessing import inception_preprocessing
 
-train_dir = "Users/bryce/Desktop/logo_detection/BelgaLogos/data"
+train_dir = "C:/Users/Kevin/Documents/Dev/LogoRecogniton/Backend/py/v2/storage/train"
 
 slim.learning.train(
     train_tensor,

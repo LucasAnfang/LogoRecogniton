@@ -47,7 +47,7 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
         model_name,
         #num_classes=(dataset.num_classes),
         is_training=False,
-        logo_names= ['Patagonia'])
+        logo_names= ['Nike'])
     ##############################################################
     # Create a dataset provider that loads data from the dataset #
     ##############################################################
@@ -79,17 +79,17 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
     ####################
     # Define the model #
     ####################
-    logits, _ = network_fn(images, logo_names= ['Patagonia'])
+    logits, _ = network_fn(images, logo_names= ['Nike'])
     variables_to_restore = slim.get_variables_to_restore()
 
-    predictions = tf.argmax(logits['Patagonia'], 1)
+    predictions = tf.argmax(logits['Nike'], 1)
     labels = tf.squeeze(labels)
 
     # Define the metrics:
     names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
         'Accuracy': slim.metrics.streaming_accuracy(predictions, labels),
         'Recall_5': slim.metrics.streaming_recall_at_k(
-            logits['Patagonia'], labels, 5),
+            logits['Nike'], labels, 5),
     })
 
     # Print the summaries to screen.
@@ -116,6 +116,6 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
         eval_op=list(names_to_updates.values()),
         variables_to_restore=variables_to_restore)
 
-def main(_):
-    print("eval: ",eval("../../resources/train","../../resources/train","../../resources/tfrecord",model_name = "inception_v4",batch_size=100))
-main(None)
+# def main(_):
+#     print("eval: ",eval("../../resources/train","../../resources/train","../../resources/tfrecord",model_name = "inception_v4",batch_size=100))
+# main(None)

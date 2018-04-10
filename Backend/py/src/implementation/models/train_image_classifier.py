@@ -191,7 +191,8 @@ def _get_variables_to_train(trainable_scopes):
 def train(checkpoint_path,train_dir,dataset_dir,
          model_name = "inception_v4",logo_name="",checkpoint_exclude_scopes =[],
           optimizer="rmsprop",learning_rate_decay_type='fixed',batch_size=32,weight_decay=0.00004,
-          max_number_of_steps=20000,log_every_n_steps=100,save_summaries_secs=60,save_interval_secs=60,task_id=0):
+          max_number_of_steps=700,log_every_n_steps=100,save_summaries_secs=60,save_interval_secs=60,task_id=0):
+
 
   trainable_scopes =['InceptionV4/Logits/'+logo_name+'_Logits','InceptionV4/Logits/'+logo_name+'_AuxLogits']
 

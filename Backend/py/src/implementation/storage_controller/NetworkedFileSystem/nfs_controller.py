@@ -1,6 +1,7 @@
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__),'../../../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__),'../../../../Entities'))
 from azure.storage.blob import PublicAccess
 from azure.storage import CloudStorageAccount
 from azure.storage.blob import (
@@ -8,7 +9,9 @@ from azure.storage.blob import (
     BlobBlock,
     BlockListType,
 )
-from src.implementation.storage_controller.Entities.log_entries_base import LogEntriesBase
+
+sys.path.append(os.path.join(os.path.dirname(__file__),'/../Entities'))
+from log_entries_base import LogEntriesBase
 from nfs_controller_config import NFS_Controller_Config
 import uuid
 import datetime
@@ -94,7 +97,7 @@ class NFS_Controller:
 		self.service.create_blob_from_path(container_name, full_blob_name, file_path)
 
 	def batched_parallel_directory_upload(self, container_name, base_nfs_path, dirpath, ext_filter_list = ['.jpeg', '.png', '.jpg']):
-		print dirpath
+		print (dirpath)
 		if(ext_filter_list == None):
 			file_paths = [os.path.realpath('{}/{}'.format(dirpath,fn)) for fn in os.listdir(dirpath)]
 		else:
@@ -115,7 +118,7 @@ class NFS_Controller:
 			threads = []
 			index = indices[0]
 			for file_path in file_paths_batch:
-				print '[Batch {}: Percent of total {}]Uploading image from file path: {}'.format(batch_number, (((index * 1.0)/ (total_files_count - 1)) * 100.0), file_path)
+				print ('[Batch {}: Percent of total {}]Uploading image from file path: {}'.format(batch_number, (((index * 1.0)/ (total_files_count - 1)) * 100.0), file_path))
 				t = threading.Thread(target=self.upload_from_path, args=(container_name, base_nfs_path, file_path))
 				threads.append(t)
 				index = index + 1
@@ -146,7 +149,7 @@ class NFS_Controller:
 			return None
 
 	def download_data(self, container_name, full_blob_name):
-		print "Full blob name: " + full_blob_name
+		print ("Full blob name: " + full_blob_name)
 		if not(self.exists(container_name)):
 			self.create_container(container_name)
 			return None

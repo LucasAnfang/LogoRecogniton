@@ -5,12 +5,13 @@ var PythonShell = require('python-shell');
 const fs = require('fs-extra');
 const uid = require('uid');
 const isImage = require('is-image');
-
+const request = require('request');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 const Dataset = require('../models/dataset');
 const Classifier = require('../models/classifier');
+const ImageObj = require('../models/image');
 
 // code from https://stackoverflow.com/questions/41462606/get-all-files-recursively-in-directories-nodejs
 function traverseDirectory(dirname, callback) {
@@ -67,6 +68,25 @@ var deleteFolderRecursive = function(path) {
       fs.rmdirSync(path);
     }
   };
+
+var download = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+        if (err) callback(err, filename);
+        else {
+            var stream = request(uri);
+            stream.pipe(
+                fs.createWriteStream(filename)
+                    .on('error', function(err){
+                        callback(error, filename);
+                        stream.read();
+                    })
+                )
+            .on('close', function() {
+                callback(null, filename);
+            });
+        }
+    });
+};
 
 exports.fetch_all_datasets = (req, res, next) => {
     // console.log(req.userData.userId);
@@ -302,59 +322,61 @@ exports.delete_dataset = (req, res, next) => {
 }
 
 exports.upload_images = (req, res, next) => {
-    const id = req.params.datasetId;
-    Dataset.findById(id)
-    .select('userId')
+    const datasetId = req.params.datasetId;
+
+    imageIds = [];
+    for(var image in req.body.images){
+        console.log(image+": "+req.body.images[image]);
+        const imageObj = new ImageObj({
+            _id: new mongoose.Types.ObjectId(),
+            userId: req.userData.userId,
+            url: req.body.images[image],
+            parentDatasetId: datasetId,
+            results: []
+        });
+        // console.log("datasets/"+datasetId+"/"+imageObj._id+".jpg")
+        // console.log(imageObj.url);
+        // download(imageObj.url, "datasets/"+datasetId+"/"+imageObj._id+".jpg", () => {
+            
+        // });
+        imageObj.save();
+        imageIds.push(imageObj._id);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else {
+        Dataset.findOneAndUpdate(
+            {
+                "_id": mongoose.Types.ObjectId(datasetId),
+                "userId": mongoose.Types.ObjectId(req.userData.userId)
+            },
+            { $pushAll: { "images": imageIds } },
+            {upsert:true, safe:true, new:true}
+        )
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: "Updated images",
+                images: result.images
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err
+            });
+        });
+    }
+    Dataset.findById(datasetId)
+    .populate('images')
     .exec()
-    .then(dataset => {
-        if (!dataset) {
-            res.status(400).json({
-                error: 'dataset doesn\'t exist'
-            });
-        } else if (dataset.userId != req.userData.userId) {
-            res.status(400).json({
-                error: 'dataset doesn\'t belong to user'
-            });
-        } else {
-            Dataset.findOneAndUpdate(
-                { images: req.images },
-                { safe: true, new: false }
-                )
-                .exec()
-                .then(docs => {
-                    if (docs) {
-                        res.status(200).json({
-                            message: "Succesfully updated dataset with images",
-                            doc: docs.nodes.map(nodes => {
-                                return {
-                                    datasetId: req.params.datasetId,
-                                    name: dataset
-                                    // trainingData: nodes.trainingData,
-                                    // request: {
-                                    //     type: 'GET',
-                                    //     url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + docs._id + '/' + nodes._id //return list of classifiers
-                                    //     //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
-                                    // }
-                                }
-                            })
-                        });
-                    } else {
-                        res.status(404).json({
-                            message: "Couldn't find dataset"
-                        })
-                    }
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        err: err
-                    });
-                }); 
-                
-        }
+    .then(result => {
+        console.log(result);
     })
+    
 }
-
-
 
 // classifiers
 exports.create_classifier = (req, res, next) => {
@@ -670,31 +692,6 @@ exports.update_category = (req, res, next) => {
             });
         });
     }
-    // const classifier = Classifier.findById(classifierId);
-        // const parent = classifier.parentDatasetId;
-        // const updateOps = {};
-        // for (const ops of Array.from(req.body)) {
-        //     updateOps[ops.propName] = ops.value;
-        // }
-        // Classifier.update({ _id: classifierId }, { $set: updateOps}) 
-        //     .exec()
-        //     .then(result => {
-        //         console.log(result);
-        //         res.status(200).json({
-        //             message: 'Classifier updated',
-        //             request: {
-        //                 type: 'GET',
-        //                 // url: 'http://localhost:3000/datasets/' + parentDatasetId + '/classifiers/' + classifierId
-        //             }
-        //         });
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //         res.status(500).json({ 
-        //             error: err 
-        //         });
-        //     });   
-    // }
 }
 
 exports.get_category = (req, res, next) => {
@@ -780,6 +777,7 @@ exports.update_all_classifiers = (req, res, next) => {
                     
     }
 }
+
 exports.delete_category = (req, res, next) => {
     const classifierId = req.params.classifierId;
     const datasetId = req.params.datasetId;
