@@ -41,6 +41,7 @@ router.post('/:datasetId/scrape', checkAuth, DatasetController.scrape_images);
 router.get('/:datasetId', checkAuth, DatasetController.fetch_dataset);
 router.delete('/:datasetId', checkAuth, DatasetController.delete_dataset);
 router.patch('/:datasetId/complete', checkAuth, DatasetController.update_all_classifiers);
+// router.post('/:datasetId/googlesearch', checkAuth, DatasetController.upload_google_urls);
 //classifier routes
 router.post('/:datasetId/classifiers', checkAuth, DatasetController.create_classifier);
 router.get('/:datasetId/classifiers', checkAuth, DatasetController.fetch_dataset_classifiers);

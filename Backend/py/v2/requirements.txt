@@ -1,0 +1,4 @@
+configparser
+requests
+tensorflow_gpu
+pprint
