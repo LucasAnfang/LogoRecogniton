@@ -221,7 +221,7 @@ exports.fetch_dataset = (req, res, next) => {
     console.log(req.userData.userId);
     const id = req.params.datasetId;
     Dataset.findById(id)
-        .select('_id userId images name isProcessed classifiers datasetType')
+        .select('_id userId images name status isProcessed classifiers datasetType')
         .populate('images', 'url')
         .exec()
         .then(dataset => {
@@ -726,6 +726,16 @@ exports.get_category = (req, res, next) => {
                 } 
             }
         )
+        .populate({ 
+            path: 'nodes',
+            populate: {
+                path: 'trainingData',
+                popuate: {
+                    path: '_id',
+                    model: 'ImageObj'
+                }
+            } 
+        })
         .exec()
         .then(result => {
             if (result) {
@@ -755,6 +765,18 @@ exports.update_all_classifiers = (req, res, next) => {
             error: "Dataset ID is not a valid ID"
         });
     } else {
+        Dataset.findByIdAndUpdate(
+                {"_id": mongoose.Types.ObjectId(datasetId)},
+                { $set: {"status": 1 }},
+                { safe: true, new: true }
+            )
+            .exec()
+            .then(result => {
+
+            })
+            .catch(err => {
+
+            });
         Classifier.find({parentDatasetId: datasetId})
             .exec()
             .then(results => {
@@ -773,7 +795,7 @@ exports.update_all_classifiers = (req, res, next) => {
                 } else {
                     res.status(404).json({message: 'No classifiers found for provided ID'})
                 }
-            })
+            });
                     
     }
 }
@@ -811,5 +833,47 @@ exports.delete_category = (req, res, next) => {
                     err: err
                 });
             });
+    }
+}
+
+exports.update_dataset_and_classifiers = (req, res, next) => {
+    const datasetId = req.params.datasetId;
+    if (!mongoose.Types.ObjectId.isValid(datasetId)) {
+        res.status(400).json({ 
+            error: "Dataset ID is not a valid ID"
+        });
+    } else {
+        Dataset.findByIdAndUpdate(
+                {"_id": mongoose.Types.ObjectId(datasetId)},
+                { $set: {"status": req.body.datasetStatus }},
+                { safe: true, new: true }
+            )
+            .exec()
+            .then(result => {
+
+            })
+            .catch(err => {
+
+            });
+        Classifier.find({parentDatasetId: datasetId})
+            .exec()
+            .then(results => {
+                if (results.length != 0) { 
+                    results.forEach(item => {
+                        Classifier.update(
+                            { _id: item._id }, 
+                            { $set: {"status": req.body.datasetStatus }},
+                            { safe: true, new: true, multi: true }
+                        )
+                        .exec();
+                    });
+                    res.status(200).json({
+                        message: "Updated status to "+ req.body.datasetStatus +" for all classifiers in dataset"
+                    });
+                } else {
+                    res.status(404).json({message: 'No classifiers found for provided ID'})
+                }
+            });
+                    
     }
 }

@@ -19,6 +19,7 @@ const storage = multer.diskStorage({
   });
 
 router.get('/training', checkAuth, TensorflowController.fetch_training_batches_and_set);
+router.get('/classify', checkAuth, TensorflowController.fetch_classify_batches_and_set);
 router.post('/checkpoint/upload', checkAuth, upload.single('checkpoint'), TensorflowController.store_checkpoints);
 router.get('/checkpoint/fetch', checkAuth, TensorflowController.fetch_checkpoint);
 router.post('/accuracy', checkAuth, TensorflowController.store_accuracy);

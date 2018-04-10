@@ -27,7 +27,7 @@ from preprocessing import preprocessing_factory
 
 slim = tf.contrib.slim
 
-def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_size=100):
+def eval(checkpoint_path,eval_dir,dataset_dir, logo_name,model_name = "inception_v4",batch_size=100):
   if not dataset_dir:
     raise ValueError('You must supply the dataset directory with --dataset_dir')
 
@@ -47,7 +47,7 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
         model_name,
         #num_classes=(dataset.num_classes),
         is_training=False,
-        logo_names= ['Nike'])
+        logo_names= [logo_name])
     ##############################################################
     # Create a dataset provider that loads data from the dataset #
     ##############################################################
@@ -79,17 +79,17 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
     ####################
     # Define the model #
     ####################
-    logits, _ = network_fn(images, logo_names= ['Nike'])
+    logits, _ = network_fn(images, logo_names= [logo_name])
     variables_to_restore = slim.get_variables_to_restore()
 
-    predictions = tf.argmax(logits['Nike'], 1)
+    predictions = tf.argmax(logits[logo_name], 1)
     labels = tf.squeeze(labels)
 
     # Define the metrics:
     names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
         'Accuracy': slim.metrics.streaming_accuracy(predictions, labels),
         'Recall_5': slim.metrics.streaming_recall_at_k(
-            logits['Nike'], labels, 5),
+            logits[logo_name], labels, 5),
     })
 
     # Print the summaries to screen.
@@ -105,16 +105,19 @@ def eval(checkpoint_path,eval_dir,dataset_dir,model_name = "inception_v4",batch_
     if tf.gfile.IsDirectory(checkpoint_path):
       checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
 
-    tf.logging.info('Evaluating %s' % checkpoint_path)
+    # tf.logging.info('Evaluating %s' % checkpoint_path)
+
 
     #print('variables_to_restore: ',variables_to_restore)
-    return slim.evaluation.evaluate_once(
+    accuracy = slim.evaluation.evaluate_once(
         master="",
         checkpoint_path=checkpoint_path,
         logdir=eval_dir,
         num_evals=num_batches,
         eval_op=list(names_to_updates.values()),
         variables_to_restore=variables_to_restore)
+
+    print(accuracy)
 
 # def main(_):
 #     print("eval: ",eval("../../resources/train","../../resources/train","../../resources/tfrecord",model_name = "inception_v4",batch_size=100))

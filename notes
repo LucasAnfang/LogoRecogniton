@@ -1,0 +1,2 @@
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+Documents\Dev\LogoRecogniton\Backend\py\src\implementation\processing_drivers\image_processing

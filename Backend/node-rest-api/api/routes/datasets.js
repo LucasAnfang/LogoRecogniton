@@ -42,6 +42,8 @@ router.post('/:datasetId/uploadImages', checkAuth, DatasetController.upload_imag
 router.get('/:datasetId', checkAuth, DatasetController.fetch_dataset);
 router.delete('/:datasetId', checkAuth, DatasetController.delete_dataset);
 router.patch('/:datasetId/complete', checkAuth, DatasetController.update_all_classifiers);
+router.patch('/:datasetId/setStatus', checkAuth, DatasetController.update_dataset_and_classifiers);
+
 //classifier routes
 router.post('/:datasetId/classifiers', checkAuth, DatasetController.create_classifier);
 router.get('/:datasetId/classifiers', checkAuth, DatasetController.fetch_dataset_classifiers);

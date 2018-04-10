@@ -13,6 +13,7 @@ from PIL import Image
 
 import tensorflow as tf
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # from datasets import dataset_utils
 
 
@@ -37,7 +38,6 @@ class ImageReader(object):
 
 def _int64_feature(value):
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
-
 
 def _bytes_feature(value):
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))

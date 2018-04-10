@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Classifier = require('../models/classifier');
+const Dataset = require('../models/dataset');
 const fs = require('fs');
 const path = require('path');
 
@@ -107,10 +108,50 @@ exports.fetch_training_batches_and_set = (req, res, next) => {
     });
 }
 
+exports.fetch_classify_batches_and_set = (req, res, next) => {
+    Dataset.find(
+        { status: 4 }
+    )
+    .select("_id classifiers images")
+    .populate("images", "url")
+    .exec()
+    .then(results => {
+        console.log(results);
+        res.status(200).json({
+            datasets: results.map(doc => {
+                return {
+                    _id: doc._id,
+                    classifiers: doc.classifiers,
+                    images: doc.images
+                }
+            })
+        });
+        results.forEach(item => {
+            Dataset.update(
+                {_id: item._id},
+                // { $set: {"status": 5 }}, 
+                { $set: {"status": 4 }}, // for testing purposes
+                { safe: true, multi: true }
+            ).exec();
+        });
+    })
+    .catch(err => {
+        res.status(500).json({
+            err: err
+        });
+    });
+}
+
 exports.store_checkpoints = (req, res, next) => {}
 
 exports.store_accuracy = (req, res, next) => {
-
+    // Classifier.update(
+        // { _id: { $in:  } },
+        // { $set: { "accuracy" :  res.body.classifiers.accuracy} }
+    //  )
+    // .exec()
+    // .then()
+    // .catch();
 }
 
 exports.store_results = (req, res, next) => {

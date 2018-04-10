@@ -13,15 +13,21 @@ const classifierSchema = mongoose.Schema({
     // status: 
     // 0 = created
     // 1 = ready to be trained
-    // 2 = processing
-    // 3 = finished processing
+    // 2 = training
+    // 3 = finished training
+    // 4 = ready to be classified
+    // 5 = classifying
+    // 6 = finished classifying
     status: { type: Number, default: 0 },
     nodes: [
         {
             _id: mongoose.Schema.Types.ObjectId,
             name: { type: String, required: true },
             // index: { type: Number, required: true },
-            trainingData: [ { type: String, required: true } ]
+            trainingData: [ { 
+                type: String, 
+                required: true }
+             ]
         }
     ]
 });
