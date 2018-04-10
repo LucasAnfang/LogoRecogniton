@@ -15,7 +15,14 @@ const datasetSchema = mongoose.Schema({
     completionTimestamp: {type: Date, default: Date.now },
     // images: [{ type: String, required: true }],
     // training/ops
-    datasetType: { type: Number, required: true }
+    datasetType: { type: Number, required: true },
+    images: [
+        {
+            _id: mongoose.Schema.Types.ObjectId,
+            url: { type: String, required: true,
+            results: [{ type: String}] }
+        }
+    ]
 });
 
 module.exports = mongoose.model('Dataset', datasetSchema);

@@ -10,5 +10,9 @@ Backend/node-rest-api/instagram-scraper.log
 *.png
 *.pyc
 Backend/env/*
+Backend/py/src/resources/*
+Backend/py/v2/*
+Backend/py/v2/
+Backend/py/src_2
 
 RXR1Q4lJucDATFD7

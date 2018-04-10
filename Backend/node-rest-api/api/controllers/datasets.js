@@ -105,12 +105,6 @@ exports.fetch_all_datasets = (req, res, next) => {
         });
 }
 
-exports.upload_images;// = multer() => {
-
-//}
-// (req, res, next) => {
-//     console.log(req.params.datasetId);
-// }
 
 exports.scrape_images = (req, res, next) => {
     const id = req.params.datasetId;
@@ -305,6 +299,59 @@ exports.delete_dataset = (req, res, next) => {
             }
         }); 
     }
+}
+
+exports.upload_images = (req, res, next) => {
+    const id = req.params.datasetId;
+    Dataset.findById(id)
+    .select('userId')
+    .exec()
+    .then(dataset => {
+        if (!dataset) {
+            res.status(400).json({
+                error: 'dataset doesn\'t exist'
+            });
+        } else if (dataset.userId != req.userData.userId) {
+            res.status(400).json({
+                error: 'dataset doesn\'t belong to user'
+            });
+        } else {
+            Dataset.findOneAndUpdate(
+                { images: req.images },
+                { safe: true, new: false }
+                )
+                .exec()
+                .then(docs => {
+                    if (docs) {
+                        res.status(200).json({
+                            message: "Succesfully updated dataset with images",
+                            doc: docs.nodes.map(nodes => {
+                                return {
+                                    datasetId: req.params.datasetId,
+                                    name: dataset
+                                    // trainingData: nodes.trainingData,
+                                    // request: {
+                                    //     type: 'GET',
+                                    //     url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + docs._id + '/' + nodes._id //return list of classifiers
+                                    //     //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
+                                    // }
+                                }
+                            })
+                        });
+                    } else {
+                        res.status(404).json({
+                            message: "Couldn't find dataset"
+                        })
+                    }
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        err: err
+                    });
+                }); 
+                
+        }
+    })
 }
 
 
