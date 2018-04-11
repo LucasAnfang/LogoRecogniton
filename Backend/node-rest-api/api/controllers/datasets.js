@@ -237,31 +237,46 @@ exports.fetch_dataset = (req, res, next) => {
                         console.log(err);
                         res.status(300).json({message: 'Dataset is empty'})
                     }
-                    else if (result.length != 0) {
-                        coverImage = 'http://localhost:2000/' + result[0];
-                        res.status(200).json({
-                            dataset: dataset,
-                            cover: coverImage,
-                            images: result,
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:2000/datasets/' + dataset._id
+                    else {
+                        ImageObj.find({"parentDatasetId": id })
+                        .exec()
+                        .then(imgs => {
+                            resultsUrls = [];
+                            for(var img of imgs) {
+                                resultsUrls.push(img.url);                        
+                            }
+                            for (var r of result) {
+                                resultsUrls.push('http://localhost:2000/' + r);                        
+                            }
+                            if (resultsUrls.length != 0) {
+                                coverImage = resultsUrls[0];
+                                res.status(200).json({
+                                    dataset: dataset,
+                                    cover: coverImage,
+                                    images: resultsUrls,
+                                    request: {
+                                        type: 'GET',
+                                        url: 'http://localhost:2000/datasets/' + dataset._id
+                                    }
+                                });
+                            } else {
+                                coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                                res.status(200).json({
+                                    dataset: dataset,
+                                    cover: coverImage,
+                                    images: resultsUrls,
+                                    request: {
+                                        type: 'GET',
+                                        url: 'http://localhost:2000/datasets/' + dataset._id
+                                    }
+                                });
                             }
                         });
-                    } else {
-                        coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
-                        res.status(200).json({
-                            dataset: dataset,
-                            cover: coverImage,
-                            images: result,
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:2000/datasets/' + dataset._id
-                            }
-                        });
+                        
                     }
-                    // console.log(result);
                 });
+
+                
             }
         })
         .catch(err => {
@@ -360,6 +375,7 @@ exports.upload_images = (req, res, next) => {
             {upsert:true, safe:true, new:true}
         )
         .exec()
+<<<<<<< HEAD
         .then(result => {
             res.status(200).json({
                 message: "Updated images",
@@ -373,6 +389,37 @@ exports.upload_images = (req, res, next) => {
                         }, 500);
                     } );
                 })
+=======
+        .then(dataset => {
+            const folder = 'datasets/' + req.params.datasetId + '/';
+            traverseDirectory(folder, function(err, result) {
+                console.log("traverseDirectory result is: " + result);
+                if (err) {
+                    console.log(err);
+                    res.status(300).json({message: 'Dataset is empty'})
+                }
+                else {
+                    ImageObj.find({"parentDatasetId": datasetId })
+                    .exec()
+                    .then(imgs => {
+                        resultsUrls = [];
+                        for(var img of imgs) {
+                            resultsUrls.push(img.url);                        
+                        }
+                        for (var i of imageUrls) {
+                            resultsUrls.push(i);
+                        }
+                        for (var r of result) {
+                            resultsUrls.push('http://localhost:2000/' + r);
+                        }
+                        res.status(200).json({
+                            message: "updated images",
+                            images: resultsUrls
+                        });
+                    });
+                    
+                }
+>>>>>>> 085bc0a767f1f2b75bc54d170cc8e1642ff18a65
             });
         })
         .catch(err => {

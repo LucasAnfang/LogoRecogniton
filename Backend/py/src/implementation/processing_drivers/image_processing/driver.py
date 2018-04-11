@@ -125,6 +125,7 @@ class Driver:
                             image_category_index.append(node_idx)
 
                 # train each classifier
+                print("training", classifier['_id'])
                 self.start_training(classifier['_id'], image_paths, image_category_index)
                 image_paths = []
                 image_category_index = []
@@ -147,7 +148,7 @@ class Driver:
         print("training")
 
         # logo name = classifierId
-        train.train("../../../resources/checkpoints/inception_v4.ckpt",
+        train.train("../../../resources/initial_checkpoint/inception_v4.ckpt",
             self.checkpoint_directory,
             "../../../resources/tfrecord",
             logo_name=classifier_id) #ask bryce to fix logoname

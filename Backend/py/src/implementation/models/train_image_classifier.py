@@ -30,6 +30,8 @@ from preprocessing import preprocessing_factory
 slim = tf.contrib.slim
 from tensorflow.python.training import saver as tf_saver
 
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 def _configure_learning_rate(learning_rate_decay_type,num_samples_per_epoch, global_step, batch_size):
   """Configures the learning rate.
 
@@ -191,7 +193,7 @@ def _get_variables_to_train(trainable_scopes):
 def train(checkpoint_path,train_dir,dataset_dir,
          model_name = "inception_v4",logo_name="",checkpoint_exclude_scopes =[],
           optimizer="rmsprop",learning_rate_decay_type='fixed',batch_size=32,weight_decay=0.00004,
-          max_number_of_steps=700,log_every_n_steps=100,save_summaries_secs=60,save_interval_secs=60,task_id=0):
+          max_number_of_steps=400,log_every_n_steps=100,save_summaries_secs=60,save_interval_secs=60,task_id=0):
 
 
   trainable_scopes =['InceptionV4/Logits/'+logo_name+'_Logits','InceptionV4/Logits/'+logo_name+'_AuxLogits']
@@ -268,6 +270,7 @@ def train(checkpoint_path,train_dir,dataset_dir,
     ####################
     def clone_fn(batch_queue,optimizer,batch_size,learning_rate_decay_type,logo_name=""):
       """Allows data parallelism by creating multiple clones of network_fn."""
+      print("BEGIN")
       with tf.device(deploy_config.inputs_device()):
         images, labels = batch_queue.dequeue()
       print("BEGIN")
