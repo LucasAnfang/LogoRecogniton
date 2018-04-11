@@ -222,7 +222,6 @@ exports.fetch_dataset = (req, res, next) => {
     const id = req.params.datasetId;
     Dataset.findById(id)
         .select('_id userId images name status isProcessed classifiers datasetType')
-        .populate('images', 'url')
         .exec()
         .then(dataset => {
             if (!dataset) {
@@ -238,11 +237,13 @@ exports.fetch_dataset = (req, res, next) => {
                         res.status(300).json({message: 'Dataset is empty'})
                     }
                     else {
-                        ImageObj.find({"parentDatasetId": id })
-                        .exec()
-                        .then(imgs => {
+                        Promise.all([
+                            ImageObj.find({ "parentDatasetId": id }),
+                            Classifier.find({ "parentDatasetId": id }).select("name _id")
+                        ])
+                        .then(([imageResults, classifierResults]) => {
                             resultsUrls = [];
-                            for(var img of imgs) {
+                            for(var img of imageResults) {
                                 resultsUrls.push(img.url);                        
                             }
                             for (var r of result) {
@@ -250,29 +251,24 @@ exports.fetch_dataset = (req, res, next) => {
                             }
                             if (resultsUrls.length != 0) {
                                 coverImage = resultsUrls[0];
-                                res.status(200).json({
-                                    datasetId: dataset._id,
-                                    datasetName: dataset.name,
-                                    cover: coverImage,
-                                    images: resultsUrls,
-                                    request: {
-                                        type: 'GET',
-                                        url: 'http://localhost:2000/datasets/' + dataset._id
-                                    }
-                                });
                             } else {
                                 coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
-                                res.status(200).json({
-                                    datasetId: dataset._id,
-                                    datasetName: dataset.name,
-                                    cover: coverImage,
-                                    images: resultsUrls,
-                                    request: {
-                                        type: 'GET',
-                                        url: 'http://localhost:2000/datasets/' + dataset._id
-                                    }
-                                });
                             }
+                            console.log(classifierResults);
+                            res.status(200).json({
+                                datasetId: dataset._id,
+                                datasetName: dataset.name,
+                                cover: coverImage,
+                                images: resultsUrls,
+                                classifiers: classifierResults,
+                                request: {
+                                    type: 'GET',
+                                    url: 'http://localhost:2000/datasets/' + dataset._id
+                                }
+                            });
+                        })
+                        .catch((err) => {
+                            console.log('Error: ', err);
                         });
                         
                     }

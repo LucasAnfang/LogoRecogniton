@@ -254,8 +254,8 @@ def inception_v4_base(inputs, final_endpoint='Mixed_7d', scope=None):
   raise ValueError('Unknown final endpoint %s' % final_endpoint)
 
 def add_classifer(logo_name, num_classes,dropout_keep_prob,prev_tensor,net):
-    print ("logo_name: ",logo_name)
-    print ("num_classes: ",num_classes)
+    # print ("logo_name: ",logo_name)
+    # print ("num_classes: ",num_classes)
 
     with tf.variable_scope(logo_name+'AuxLogits'):
       # 17 x 17 x 1024
@@ -356,7 +356,7 @@ def inception_v4(inputs, num_classes=1001, is_training=True,
           for logo_name in logo_names:
               if logo_name != "":
                   logo_name +="_"
-                  print("logo_name",logo_name)
+                  # print("logo_name",logo_name)
                   logits,end_points[logo_name+'AuxLogits'] = add_classifer(logo_name,2,dropout_keep_prob,end_points['Mixed_6h'],net)
                   with tf.variable_scope(logo_name+'Logits'):
                       end_points[logo_name+'Logits'] = logits

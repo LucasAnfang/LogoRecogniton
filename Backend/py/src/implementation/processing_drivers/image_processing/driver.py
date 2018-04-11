@@ -89,13 +89,14 @@ class Driver:
 
         if res.status_code == requests.codes.ok:
             print("Retrieved classification images from Rest API")
+            datasets = res.json()['datasets']
 
-            for dataset in res.json()['datasets']:
+            for d_idx, dataset in enumerate(datasets):
                 dataset_ids.append(dataset["_id"])
                 image_paths = []
+                classifier_ids = []
                 for classifier in dataset['classifiers']:
-                    print(classifier)
-
+                    classifier_ids.append(classifier)
                 for image in dataset['images']:
                     response = requests.get(image['url'])
                     img = Image.open(BytesIO(response.content))
@@ -105,42 +106,44 @@ class Driver:
                         with open(fname, 'wb') as out_file:
                             shutil.copyfileobj(BytesIO(response.content), out_file)
                         image_paths.append(fname)
-                self.start_classify(image_paths)
+                if not image_paths:
+                    print("No images in", dataset['_id'], "...skipping...")
+                else:
+                    print("classifying", dataset['_id'])
+                    # print("classifiers", classifier_ids, "images", image_paths)
+                    self.start_classify(d_idx, image_paths, classifier_ids)
 
-    def start_classify(self, image_paths):
+    def start_classify(self, iter, image_paths, classifier_ids):
         nameMap = []
         with open("../../models/class_list.txt", "r") as ins:
             for line in ins:
                 nameMap.append(line.split('\n')[0])
-        print(image_paths)
-        # image_paths
 
+        # print(image_paths)
+        image_bytes = []            # store the byte data of the training images
+        for img_path in image_paths:
+            data = tf.gfile.FastGFile(img_path, 'rb').read()
+            image_bytes.append(data)
+        classifiers = [""]
+        classifiers.extend(classifier_ids)
+        results = test.classify(self.train_directory+'/prev',image_bytes,logo_names=classifiers,reuse=self.testvar)
+        self.testvar = True
 
-        # if res.status_code == requests.codes.ok:
-        #     print("Retrieved classification images from Rest API")
-        #
-        #     for dataset in res.json()['datasets']:
-        #         for classifier in dataset['classifiers']:
-        #             print("Loading classifiers")
-        #             print ("classifierId:", classifier)
-        #
-        #         for image in dataset['images']:
-        #             print (image)
-                    # response = requests.get(image)
-                    # img = Image.open(BytesIO(response.content))
+        # while(True):
+            # indices = [(current_index + i) for i in range(batch_size)]
+            # images = [r2d2.get_image_with_path(post_entities.posts[i]['image_path']) for i in indices if (i < len(post_entities.posts))]
+            # current_index += len(images)
+            # if(len(images) == 0):
+            #     break
 
-                    # if img.format == 'JPEG':
-                    #     pathlib.Path('../../../storage/classify/').mkdir(parents=True, exist_ok=True)
-                    #     fname = '../../../storage/classify/' +  + '.jpg'
-                    #     with open(fname, 'wb') as out_file:
-                    #         shutil.copyfileobj(BytesIO(response.content), out_file)
-                    #
-                    #     image_index += 1
-                    #     image_paths.append(fname)
-                    #     image_category_index.append(node_idx)
-
-            # test.setup_then_classify("../../../resources/to_classify/"+classifierId)
-        # test.setup_then_classify("../../../resources/results/Nike")
+            # patching_index = indices[0]
+            # for index in range(len(images)):
+                # post_entities.setImageContextAtIndex(patching_index, [nameMap[node_id-1] for node_id in results[""][index]])
+                # post_entities.setAccuracyAtIndex(patching_index, float(results[brand][index][1]))
+                # post_entities.setHasLogoAtIndex(patching_index, bool(round(results[brand][index][1])))
+        #         patching_index += 1
+        # print("Classification completed for brand: ", brand)
+        # test.setup_then_classify("../../../resources/to_classify/"+classifierId)
 
     def get_training_images(self):
         print("starting driver...")

@@ -14,7 +14,7 @@ from preprocessing import inception_preprocessing
 from operator import add
 slim = tf.contrib.slim
 
-def classify(checkpoints_dir, images,logo_names=[""], reuse=False):
+def classify(checkpoints_dir, images, logo_names=[""], reuse=False):
     image_size = inception.inception_v4.default_image_size
     probabilities_list = []
     processed_image_list = []
