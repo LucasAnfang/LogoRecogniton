@@ -237,31 +237,46 @@ exports.fetch_dataset = (req, res, next) => {
                         console.log(err);
                         res.status(300).json({message: 'Dataset is empty'})
                     }
-                    else if (result.length != 0) {
-                        coverImage = 'http://localhost:2000/' + result[0];
-                        res.status(200).json({
-                            dataset: dataset,
-                            cover: coverImage,
-                            images: result,
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:2000/datasets/' + dataset._id
+                    else {
+                        ImageObj.find({"parentDatasetId": id })
+                        .exec()
+                        .then(imgs => {
+                            resultsUrls = [];
+                            for(var img of imgs) {
+                                resultsUrls.push(img.url);                        
+                            }
+                            for (var r of result) {
+                                resultsUrls.push('http://localhost:2000/' + r);                        
+                            }
+                            if (resultsUrls.length != 0) {
+                                coverImage = resultsUrls[0];
+                                res.status(200).json({
+                                    dataset: dataset,
+                                    cover: coverImage,
+                                    images: resultsUrls,
+                                    request: {
+                                        type: 'GET',
+                                        url: 'http://localhost:2000/datasets/' + dataset._id
+                                    }
+                                });
+                            } else {
+                                coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                                res.status(200).json({
+                                    dataset: dataset,
+                                    cover: coverImage,
+                                    images: resultsUrls,
+                                    request: {
+                                        type: 'GET',
+                                        url: 'http://localhost:2000/datasets/' + dataset._id
+                                    }
+                                });
                             }
                         });
-                    } else {
-                        coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
-                        res.status(200).json({
-                            dataset: dataset,
-                            cover: coverImage,
-                            images: result,
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:2000/datasets/' + dataset._id
-                            }
-                        });
+                        
                     }
-                    // console.log(result);
                 });
+
+                
             }
         })
         .catch(err => {
@@ -361,17 +376,23 @@ exports.upload_images = (req, res, next) => {
         )
         .exec()
         .then(result => {
-            res.status(200).json({
-                message: "Updated images",
-                images: result.images.map(img => {
-                    ImageObj.findById(img, function (err, image) { 
-                        var url = image.url;
-                        //THIS WORKS BUT DOESN'T GET FETCHED IN TIME SO THE URL RETURNED IS NULL
-                        console.log("url is: " + url);
-                        return image.url;
-                    } );
+            
+            ImageObj.find({"parentDatasetId": datasetId })
+                .exec()
+                .then(results => {
+                    resultsUrls = [];
+                    for(var result of results) {
+                        resultsUrls.push(result.url);                        
+                    }
+                    for(var url of imageUrls) {
+                        resultsUrls.push(url);
+                    }
+                    console.log (resultsUrls);
+                    res.status(200).json({
+                        message: "updated images",
+                        images: resultsUrls
+                    });
                 })
-            });
         })
         .catch(err => {
             res.status(500).json({

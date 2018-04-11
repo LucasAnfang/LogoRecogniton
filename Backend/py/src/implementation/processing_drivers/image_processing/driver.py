@@ -125,6 +125,7 @@ class Driver:
                             image_category_index.append(node_idx)
 
                 # train each classifier
+                print("training", classifier['_id'])
                 self.start_training(classifier['_id'], image_paths, image_category_index)
                 image_paths = []
                 image_category_index = []

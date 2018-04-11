@@ -30,6 +30,8 @@ from preprocessing import preprocessing_factory
 slim = tf.contrib.slim
 from tensorflow.python.training import saver as tf_saver
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 def _configure_learning_rate(learning_rate_decay_type,num_samples_per_epoch, global_step, batch_size):
   """Configures the learning rate.
 
