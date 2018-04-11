@@ -405,23 +405,6 @@ exports.upload_images = (req, res, next) => {
                     
                 }
             });
-
-            // ImageObj.find({"parentDatasetId": datasetId })
-            //     .exec()
-            //     .then(results => {
-            //         resultsUrls = [];
-            //         for(var result of results) {
-            //             resultsUrls.push(result.url);                        
-            //         }
-            //         for(var url of imageUrls) {
-            //             resultsUrls.push(url);
-            //         }
-            //         console.log (resultsUrls);
-            //         res.status(200).json({
-            //             message: "updated images",
-            //             images: resultsUrls
-            //         });
-            //     })
         })
         .catch(err => {
             res.status(500).json({

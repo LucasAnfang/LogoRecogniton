@@ -148,7 +148,7 @@ class Driver:
         print("training")
 
         # logo name = classifierId
-        train.train("../../../resources/checkpoints/inception_v4.ckpt",
+        train.train("../../../resources/initial_checkpoint/inception_v4.ckpt",
             self.checkpoint_directory,
             "../../../resources/tfrecord",
             logo_name=classifier_id) #ask bryce to fix logoname
