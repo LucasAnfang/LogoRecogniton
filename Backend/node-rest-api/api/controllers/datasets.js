@@ -379,31 +379,26 @@ exports.upload_images = (req, res, next) => {
             const folder = 'datasets/' + req.params.datasetId + '/';
             traverseDirectory(folder, function(err, result) {
                 console.log("traverseDirectory result is: " + result);
-                if (err) {
-                    console.log(err);
-                    res.status(300).json({message: 'Dataset is empty'})
-                }
-                else {
-                    ImageObj.find({"parentDatasetId": datasetId })
-                    .exec()
-                    .then(imgs => {
-                        resultsUrls = [];
-                        for(var img of imgs) {
-                            resultsUrls.push(img.url);                        
-                        }
-                        for (var i of imageUrls) {
-                            resultsUrls.push(i);
-                        }
-                        for (var r of result) {
-                            resultsUrls.push('http://localhost:2000/' + r);
-                        }
-                        res.status(200).json({
-                            message: "updated images",
-                            images: resultsUrls
-                        });
+                
+                ImageObj.find({"parentDatasetId": datasetId })
+                .exec()
+                .then(imgs => {
+                    resultsUrls = [];
+                    for(var img of imgs) {
+                        resultsUrls.push(img.url);                        
+                    }
+                    for (var i of imageUrls) {
+                        resultsUrls.push(i);
+                    }
+                    for (var r of result) {
+                        resultsUrls.push('http://localhost:2000/' + r);
+                    }
+                    res.status(200).json({
+                        message: "updated images",
+                        images: resultsUrls
                     });
-                    
-                }
+                });
+
             });
         })
         .catch(err => {

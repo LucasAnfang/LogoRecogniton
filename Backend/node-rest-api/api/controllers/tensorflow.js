@@ -95,8 +95,8 @@ exports.fetch_training_batches_and_set = (req, res, next) => {
         results.forEach(item => {
             Classifier.update(
                 {_id: item._id},
-                // { $set: {"status": 2 }}, 
-                { $set: {"status": 2 }}, // for testing purposes
+                { $set: {"status": 2 }}, 
+                // { $set: {"status": 1 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
         });
@@ -116,24 +116,24 @@ exports.fetch_classify_batches_and_set = (req, res, next) => {
     .populate("images", "url")
     .exec()
     .then(results => {
-        ImageObj.find({"parentDatasetId": datasetId })
-            .exec()
-            .then(imgs => {
-                resultsUrls = [];
-                for(var img of imgs) {
-                    resultsUrls.push(img.url);                        
-                }
-                for (var i of imageUrls) {
-                    resultsUrls.push(i);
-                }
-                for (var r of result) {
-                    resultsUrls.push('http://localhost:2000/' + r);
-                }
-                res.status(200).json({
-                    message: "updated images",
-                    images: resultsUrls
-                });
-            });
+        // ImageObj.find({"parentDatasetId": datasetId })
+        //     .exec()
+        //     .then(imgs => {
+        //         resultsUrls = [];
+        //         for(var img of imgs) {
+        //             resultsUrls.push(img.url);                        
+        //         }
+        //         for (var i of imageUrls) {
+        //             resultsUrls.push(i);
+        //         }
+        //         for (var r of result) {
+        //             resultsUrls.push('http://localhost:2000/' + r);
+        //         }
+        //         res.status(200).json({
+        //             message: "updated images",
+        //             images: resultsUrls
+        //         });
+        //     });
 
         console.log(results);
         res.status(200).json({
@@ -148,7 +148,7 @@ exports.fetch_classify_batches_and_set = (req, res, next) => {
         results.forEach(item => {
             Dataset.update(
                 {_id: item._id},
-                { $set: {"status": 5 }}, 
+                { $set: {"status": 4 }}, 
                 // { $set: {"status": 4 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
@@ -201,7 +201,7 @@ exports.set_completed_classifier_statuses = (req, res, next) => {
         results.forEach(item => {
             Classifier.update(
                 {_id: item._id},
-                { $set: {"status": 3 }}, // for testing purposes
+                { $set: {"status": 3 }},
                 { safe: true, multi: true }
             ).exec();
         });

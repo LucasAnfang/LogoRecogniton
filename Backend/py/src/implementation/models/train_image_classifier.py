@@ -161,10 +161,10 @@ def _get_init_fn(checkpoint_path,train_dir,checkpoint_exclude_scopes = []):
 
   if tf.gfile.IsDirectory(checkpoint_path):
       checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
-      print("1", checkpoint_path)
+      # print("1", checkpoint_path)
   else:
       checkpoint_path = checkpoint_path
-      print("2", checkpoint_path)
+      # print("2", checkpoint_path)
 
   tf.logging.info('Fine-tuning from %s' % checkpoint_path)
 
@@ -272,13 +272,13 @@ def train(checkpoint_path,train_dir,dataset_dir,
     ####################
     def clone_fn(batch_queue,optimizer,batch_size,learning_rate_decay_type,logo_name=""):
       """Allows data parallelism by creating multiple clones of network_fn."""
-      print("BEGIN")
+      # print("BEGIN")
       with tf.device(deploy_config.inputs_device()):
         images, labels = batch_queue.dequeue()
-      print("BEGIN")
+      # print("BEGIN")
       logits, end_points = network_fn(images, logo_names= [logo_name])
-      print("END")
-      print("logo_name_is: ",logo_name)
+      # print("END")
+      # print("logo_name_is: ",logo_name)
       #############################
       # Specify the loss function #
       #############################

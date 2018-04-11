@@ -78,23 +78,66 @@ class Driver:
             output = eval.eval("../../../resources/train","../../../resources/train","../../../resources/tfrecord",logo_name=classifier_id,model_name = "inception_v4",batch_size=100)
             print("eval: ", output)
 
-    def start_classify(self):
+    def get_classify_images(self):
         # headers = {"Authorization": config.auth['JWT']}
         JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
         headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
         # res = requests.get(config.routes['Training'], headers=headers)
         res = requests.get("http://localhost:2000/tensorflow/classify", headers=headers)
 
+        dataset_ids = []
+
         if res.status_code == requests.codes.ok:
             print("Retrieved classification images from Rest API")
 
             for dataset in res.json()['datasets']:
+                dataset_ids.append(dataset["_id"])
+                image_paths = []
                 for classifier in dataset['classifiers']:
-                    print("Loading classifiers")
-                    print ("classifierId:", classifier)
+                    print(classifier)
 
                 for image in dataset['images']:
-                    print (image)
+                    response = requests.get(image['url'])
+                    img = Image.open(BytesIO(response.content))
+                    if img.format == 'JPEG':
+                        pathlib.Path('../../../storage/classify/').mkdir(parents=True, exist_ok=True)
+                        fname = '../../../storage/classify/' + str(image['_id']) + '.jpg'
+                        with open(fname, 'wb') as out_file:
+                            shutil.copyfileobj(BytesIO(response.content), out_file)
+                        image_paths.append(fname)
+                self.start_classify(image_paths)
+
+    def start_classify(self, image_paths):
+        nameMap = []
+        with open("../../models/class_list.txt", "r") as ins:
+            for line in ins:
+                nameMap.append(line.split('\n')[0])
+        print(image_paths)
+        # image_paths
+
+
+        # if res.status_code == requests.codes.ok:
+        #     print("Retrieved classification images from Rest API")
+        #
+        #     for dataset in res.json()['datasets']:
+        #         for classifier in dataset['classifiers']:
+        #             print("Loading classifiers")
+        #             print ("classifierId:", classifier)
+        #
+        #         for image in dataset['images']:
+        #             print (image)
+                    # response = requests.get(image)
+                    # img = Image.open(BytesIO(response.content))
+
+                    # if img.format == 'JPEG':
+                    #     pathlib.Path('../../../storage/classify/').mkdir(parents=True, exist_ok=True)
+                    #     fname = '../../../storage/classify/' +  + '.jpg'
+                    #     with open(fname, 'wb') as out_file:
+                    #         shutil.copyfileobj(BytesIO(response.content), out_file)
+                    #
+                    #     image_index += 1
+                    #     image_paths.append(fname)
+                    #     image_category_index.append(node_idx)
 
             # test.setup_then_classify("../../../resources/to_classify/"+classifierId)
         # test.setup_then_classify("../../../resources/results/Nike")
@@ -151,18 +194,16 @@ class Driver:
 
                 # train each classifier
                 print("training", classifier['_id'])
-                # self.start_training(classifier['_id'], image_paths, image_category_index)
+                self.start_training(classifier['_id'], image_paths, image_category_index)
                 image_paths = []
                 image_category_index = []
                 image_bytes = []
 
-            payload = {'classifierIds': classifier_ids}
+            payload = json.dumps({'classifierIds': classifier_ids})
+            print (payload)
             finishedUrl = "http://localhost:2000/tensorflow/completedTraining"
             headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
-
-            r = requests.post(finishedUrl, headers=headers, data=json.dumps(payload))
-
-            # self.start_eval(classifier_ids)
+            r = requests.post(finishedUrl, headers=headers, data=payload)
 
 
     def start_training(self, classifier_id, image_paths, labels):
@@ -184,7 +225,8 @@ class Driver:
         self.swap_out_checkpoints(self.train_directory+'/prev',self.train_directory)
 
 def main():
-    Driver().get_training_images()
+    # Driver().get_training_images()
+    Driver().get_classify_images()
     # Driver().start_classify()
     # Driver().start_eval()
 
