@@ -364,7 +364,12 @@ exports.upload_images = (req, res, next) => {
             res.status(200).json({
                 message: "Updated images",
                 images: result.images.map(img => {
-                    return img.url;
+                    ImageObj.findById(img, function (err, image) { 
+                        var url = image.url;
+                        //THIS WORKS BUT DOESN'T GET FETCHED IN TIME SO THE URL RETURNED IS NULL
+                        console.log("url is: " + url);
+                        return image.url;
+                    } );
                 })
             });
         })
