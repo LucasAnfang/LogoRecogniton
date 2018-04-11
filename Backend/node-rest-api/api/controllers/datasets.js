@@ -325,6 +325,7 @@ exports.upload_images = (req, res, next) => {
     const datasetId = req.params.datasetId;
 
     imageIds = [];
+    imageUrls = [];
     for(var image in req.body.images){
         console.log(image+": "+req.body.images[image]);
         const imageObj = new ImageObj({
@@ -341,6 +342,8 @@ exports.upload_images = (req, res, next) => {
         // });
         imageObj.save();
         imageIds.push(imageObj._id);
+        console.log(imageObj._id, imageObj.url);
+        imageUrls.push(imageObj.url);
     }
 
     if (!mongoose.Types.ObjectId.isValid(datasetId)) {
@@ -360,7 +363,9 @@ exports.upload_images = (req, res, next) => {
         .then(result => {
             res.status(200).json({
                 message: "Updated images",
-                images: result.images
+                images: result.images.map(img => {
+                    return img.url;
+                })
             });
         })
         .catch(err => {
@@ -373,7 +378,7 @@ exports.upload_images = (req, res, next) => {
     .populate('images')
     .exec()
     .then(result => {
-        console.log(result);
+        // console.log(result);
     })
     
 }
