@@ -390,8 +390,10 @@ exports.upload_images = (req, res, next) => {
                     for (var i of imageUrls) {
                         resultsUrls.push(i);
                     }
-                    for (var r of result) {
-                        resultsUrls.push('http://localhost:2000/' + r);
+                    if (!err) {    
+                        for (var r of result) {
+                            resultsUrls.push('http://localhost:2000/' + r);
+                        }
                     }
                     res.status(200).json({
                         message: "updated images",
