@@ -96,7 +96,7 @@ exports.fetch_training_batches_and_set = (req, res, next) => {
             Classifier.update(
                 {_id: item._id},
                 // { $set: {"status": 2 }}, 
-                { $set: {"status": 1 }}, // for testing purposes
+                { $set: {"status": 2 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
         });
@@ -116,6 +116,25 @@ exports.fetch_classify_batches_and_set = (req, res, next) => {
     .populate("images", "url")
     .exec()
     .then(results => {
+        ImageObj.find({"parentDatasetId": datasetId })
+            .exec()
+            .then(imgs => {
+                resultsUrls = [];
+                for(var img of imgs) {
+                    resultsUrls.push(img.url);                        
+                }
+                for (var i of imageUrls) {
+                    resultsUrls.push(i);
+                }
+                for (var r of result) {
+                    resultsUrls.push('http://localhost:2000/' + r);
+                }
+                res.status(200).json({
+                    message: "updated images",
+                    images: resultsUrls
+                });
+            });
+
         console.log(results);
         res.status(200).json({
             datasets: results.map(doc => {
@@ -129,8 +148,8 @@ exports.fetch_classify_batches_and_set = (req, res, next) => {
         results.forEach(item => {
             Dataset.update(
                 {_id: item._id},
-                // { $set: {"status": 5 }}, 
-                { $set: {"status": 4 }}, // for testing purposes
+                { $set: {"status": 5 }}, 
+                // { $set: {"status": 4 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
         });
@@ -145,6 +164,7 @@ exports.fetch_classify_batches_and_set = (req, res, next) => {
 exports.store_checkpoints = (req, res, next) => {}
 
 exports.store_accuracy = (req, res, next) => {
+    // ids = res.body.classifiers
     // Classifier.update(
         // { _id: { $in:  } },
         // { $set: { "accuracy" :  res.body.classifiers.accuracy} }
@@ -152,6 +172,45 @@ exports.store_accuracy = (req, res, next) => {
     // .exec()
     // .then()
     // .catch();
+}
+
+exports.set_completed_classifier_statuses = (req, res, next) => {
+    Classifier.find(
+        {
+            '_id': { $in: req.body.classifierIds}
+        }
+    )
+    .exec()
+    .then(results => {
+        console.log(results);
+        res.status(200).json({
+            classifiers: results.map(doc => {
+                return {
+                    _id: doc._id,
+                    name: doc.name, 
+                    nodes: doc.nodes.map(node => {
+                        return {
+                            _id: node._id,
+                            name: node.name,
+                            trainingData: node.trainingData
+                        }
+                    })
+                }
+            })
+        });
+        results.forEach(item => {
+            Classifier.update(
+                {_id: item._id},
+                { $set: {"status": 3 }}, // for testing purposes
+                { safe: true, multi: true }
+            ).exec();
+        });
+    })
+    .catch(err => {
+        res.status(500).json({
+            err: err
+        });
+    });
 }
 
 exports.store_results = (req, res, next) => {

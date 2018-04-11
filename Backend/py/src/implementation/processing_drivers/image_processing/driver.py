@@ -15,6 +15,7 @@ from io import BytesIO
 import numpy as np
 import skimage.io as io
 import pathlib
+import json
 
 # TODO if the system said cant find module look at this next line
 # (modules in different directories need to be referenced through system paths)
@@ -41,9 +42,34 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 class Driver:
     def __init__(self):
         # TODO: This now stored on your rest API so ignore this and make calls to routes to grab and store checkpoints
-        self.checkpoint_directory = "../../../resources/checkpoints"
+        self.checkpoint_directory = "../../../resources/checkpoints/inception_v4.ckpt"
+        self.train_directory = "../../../resources/train"
         # if it has been tested
         self.testvar = False
+
+    def swap_out_checkpoints(self, prev, next):
+        def clear_dir(name):
+            for the_file in os.listdir(name):
+                file_path = os.path.join(name, the_file)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    print(e)
+        def swap_dir(prev, next):
+            for the_file in os.listdir(next):
+                file_path = os.path.join(next, the_file)
+                try:
+                    if os.path.isfile(file_path):
+                        shutil.move(file_path, prev)
+                except Exception as e:
+                    print(e)
+        if os.path.isdir(prev) and os.path.isdir(next):
+            clear_dir(prev)
+            swap_dir(prev,next)
+            clear_dir(next)
+        else:
+            print("one of these faild")
 
     def start_eval(self, classifier_ids):
         print("evaulating classifier accuracies")
@@ -55,19 +81,17 @@ class Driver:
     def start_classify(self):
         # headers = {"Authorization": config.auth['JWT']}
         JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
-        headers = {"Authorization": JWT}
+        headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
         # res = requests.get(config.routes['Training'], headers=headers)
         res = requests.get("http://localhost:2000/tensorflow/classify", headers=headers)
 
         if res.status_code == requests.codes.ok:
+            print("Retrieved classification images from Rest API")
 
-            print("Retrieved training images from Rest API")
-            datasets = res.json()['datasets']
-            for dataset in datasets:
-                print("datasetId:", dataset['_id'])
+            for dataset in res.json()['datasets']:
                 for classifier in dataset['classifiers']:
                     print("Loading classifiers")
-                    print ("classifierId:",classifier)
+                    print ("classifierId:", classifier)
 
                 for image in dataset['images']:
                     print (image)
@@ -81,9 +105,10 @@ class Driver:
 
         # headers = {"Authorization": config.auth['JWT']}
         JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
-        headers = {"Authorization": JWT}
+        headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
         # res = requests.get(config.routes['Training'], headers=headers)
-        res = requests.get("http://localhost:2000/tensorflow/training", headers=headers)
+        trainingUrl = "http://localhost:2000/tensorflow/training"
+        res = requests.get(trainingUrl, headers=headers)
 
         if res.status_code == requests.codes.ok:
             print("Retrieved training images from Rest API")
@@ -126,10 +151,16 @@ class Driver:
 
                 # train each classifier
                 print("training", classifier['_id'])
-                self.start_training(classifier['_id'], image_paths, image_category_index)
+                # self.start_training(classifier['_id'], image_paths, image_category_index)
                 image_paths = []
                 image_category_index = []
                 image_bytes = []
+
+            payload = {'classifierIds': classifier_ids}
+            finishedUrl = "http://localhost:2000/tensorflow/completedTraining"
+            headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
+
+            r = requests.post(finishedUrl, headers=headers, data=json.dumps(payload))
 
             # self.start_eval(classifier_ids)
 
@@ -145,17 +176,15 @@ class Driver:
 
         # print(image_category_index)
         convert.convert_to("../../../resources/tfrecord", image_bytes, labels)
-        print("training")
-
-        # logo name = classifierId
-        train.train("../../../resources/initial_checkpoint/inception_v4.ckpt",
+        train.train(
             self.checkpoint_directory,
+            self.train_directory,
             "../../../resources/tfrecord",
             logo_name=classifier_id) #ask bryce to fix logoname
+        self.swap_out_checkpoints(self.train_directory+'/prev',self.train_directory)
 
 def main():
     Driver().get_training_images()
-    # Driver().start_eval()
     # Driver().start_classify()
     # Driver().start_eval()
 

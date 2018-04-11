@@ -150,7 +150,7 @@ def _get_init_fn(checkpoint_path,train_dir,checkpoint_exclude_scopes = []):
   # TODO(sguada) variables.filter_variables()
   variables_to_restore = []
   for var in slim.get_model_variables():
-    print ("var????: ", var);
+    # print ("var????: ", var);
     excluded = False
     for exclusion in exclusions:
       if var.op.name.startswith(exclusion):
@@ -160,9 +160,11 @@ def _get_init_fn(checkpoint_path,train_dir,checkpoint_exclude_scopes = []):
       variables_to_restore.append(var)
 
   if tf.gfile.IsDirectory(checkpoint_path):
-    checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
+      checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
+      print("1", checkpoint_path)
   else:
-    checkpoint_path = checkpoint_path
+      checkpoint_path = checkpoint_path
+      print("2", checkpoint_path)
 
   tf.logging.info('Fine-tuning from %s' % checkpoint_path)
 
@@ -286,9 +288,9 @@ def train(checkpoint_path,train_dir,dataset_dir,
         tf.losses.softmax_cross_entropy(
             logits=end_points[logo_name+'AuxLogits'], onehot_labels=labels,
             label_smoothing=0.0, weights=0.4, scope='aux_loss')
-      tf.losses.softmax_cross_entropy(
-          logits=end_points[logo_name+'Logits'], onehot_labels=labels,
-          label_smoothing=0.0, weights=1.0)
+        tf.losses.softmax_cross_entropy(
+              logits=end_points[logo_name+'Logits'], onehot_labels=labels,
+              label_smoothing=0.0, weights=1.0)
       return end_points
 
     # Gather initial summaries.
@@ -356,6 +358,14 @@ def train(checkpoint_path,train_dir,dataset_dir,
     ###########################
     # Kicks off the training. #
     ###########################
+    # sess = tf.Session()
+    # arg_scope = inception_v4_arg_scope()
+    # input_tensor = tf.placeholder(tf.float32, (None, 299, 299, 3))
+    # with slim.arg_scope(arg_scope):
+    #     logits, end_points = inception_v4(input_tensor, is_training=False)
+    # saver = tf.train.Saver()
+    # saver.restore(sess, checkpoint_file)
+
     slim.learning.train(
         train_tensor,
         logdir=train_dir,

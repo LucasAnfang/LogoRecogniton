@@ -232,7 +232,7 @@ exports.fetch_dataset = (req, res, next) => {
             } else {
                 const folder = 'datasets/' + req.params.datasetId + '/'; //+ req.params.datasetId + '/';
                 traverseDirectory(folder, function(err, result) {
-                    console.log("traverseDirectory result is: " + result);
+                    // console.log("traverseDirectory result is: " + result);
                     if (err) {
                         console.log(err);
                         res.status(300).json({message: 'Dataset is empty'})
@@ -251,7 +251,8 @@ exports.fetch_dataset = (req, res, next) => {
                             if (resultsUrls.length != 0) {
                                 coverImage = resultsUrls[0];
                                 res.status(200).json({
-                                    dataset: dataset,
+                                    datasetId: dataset._id,
+                                    datasetName: dataset.name,
                                     cover: coverImage,
                                     images: resultsUrls,
                                     request: {
@@ -262,7 +263,8 @@ exports.fetch_dataset = (req, res, next) => {
                             } else {
                                 coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
                                 res.status(200).json({
-                                    dataset: dataset,
+                                    datasetId: dataset._id,
+                                    datasetName: dataset.name,
                                     cover: coverImage,
                                     images: resultsUrls,
                                     request: {
@@ -275,8 +277,6 @@ exports.fetch_dataset = (req, res, next) => {
                         
                     }
                 });
-
-                
             }
         })
         .catch(err => {

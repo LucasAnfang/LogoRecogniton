@@ -13,7 +13,7 @@ from PIL import Image
 
 import tensorflow as tf
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # from datasets import dataset_utils
 
 
