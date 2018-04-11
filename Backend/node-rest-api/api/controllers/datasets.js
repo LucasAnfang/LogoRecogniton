@@ -368,7 +368,9 @@ exports.upload_images = (req, res, next) => {
                         var url = image.url;
                         //THIS WORKS BUT DOESN'T GET FETCHED IN TIME SO THE URL RETURNED IS NULL
                         console.log("url is: " + url);
-                        return image.url;
+                        setTimeout(function(){
+                            return image.url;
+                        }, 500);
                     } );
                 })
             });
