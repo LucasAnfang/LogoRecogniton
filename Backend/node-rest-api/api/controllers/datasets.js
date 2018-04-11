@@ -375,21 +375,6 @@ exports.upload_images = (req, res, next) => {
             {upsert:true, safe:true, new:true}
         )
         .exec()
-<<<<<<< HEAD
-        .then(result => {
-            res.status(200).json({
-                message: "Updated images",
-                images: result.images.map(img => {
-                    ImageObj.findById(img, function (err, image) { 
-                        var url = image.url;
-                        //THIS WORKS BUT DOESN'T GET FETCHED IN TIME SO THE URL RETURNED IS NULL
-                        console.log("url is: " + url);
-                        setTimeout(function(){
-                            return image.url;
-                        }, 500);
-                    } );
-                })
-=======
         .then(dataset => {
             const folder = 'datasets/' + req.params.datasetId + '/';
             traverseDirectory(folder, function(err, result) {
@@ -419,7 +404,6 @@ exports.upload_images = (req, res, next) => {
                     });
                     
                 }
->>>>>>> 085bc0a767f1f2b75bc54d170cc8e1642ff18a65
             });
         })
         .catch(err => {
@@ -533,7 +517,6 @@ exports.fetch_dataset_classifiers = (req, res, next) => {
                                 request: {
                                     type: 'GET',
                                     url: 'http://localhost:2000/datasets/'+datasetId+'/classifiers/' + doc._id //return list of classifiers
-                                    //url: 'http://localhost:3000/products/' + order.product //return information on ordered product
                                 }
                             }
                         })
