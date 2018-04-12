@@ -16,6 +16,7 @@ import numpy as np
 import skimage.io as io
 import pathlib
 import json
+import ntpath
 
 # TODO if the system said cant find module look at this next line
 # (modules in different directories need to be referenced through system paths)
@@ -46,7 +47,9 @@ class Driver:
         self.train_directory = "../../../resources/train"
         # if it has been tested
         self.testvar = False
-
+    def path_leaf(self,path):
+        head, tail = ntpath.split(path)
+        return tail or ntpath.basename(head)
     def swap_out_checkpoints(self, prev, next):
         def clear_dir(name):
             for the_file in os.listdir(name):
@@ -97,6 +100,7 @@ class Driver:
                 classifier_ids = []
                 for classifier in dataset['classifiers']:
                     classifier_ids.append(classifier)
+                    # print(classifier)
                 for image in dataset['images']:
                     response = requests.get(image['url'])
                     img = Image.open(BytesIO(response.content))
@@ -108,12 +112,13 @@ class Driver:
                         image_paths.append(fname)
                 if not image_paths:
                     print("No images in", dataset['_id'], "...skipping...")
+                    # send completion response anyways
                 else:
                     print("classifying", dataset['_id'])
                     # print("classifiers", classifier_ids, "images", image_paths)
-                    self.start_classify(d_idx, image_paths, classifier_ids)
+                    self.start_classify(dataset["_id"], image_paths, classifier_ids)
 
-    def start_classify(self, iter, image_paths, classifier_ids):
+    def start_classify(self, brand, image_paths, classifier_ids):
         nameMap = []
         with open("../../models/class_list.txt", "r") as ins:
             for line in ins:
@@ -121,13 +126,34 @@ class Driver:
 
         # print(image_paths)
         image_bytes = []            # store the byte data of the training images
+        image_ids = []              # store the image id (name without .jpg)
+
         for img_path in image_paths:
             data = tf.gfile.FastGFile(img_path, 'rb').read()
             image_bytes.append(data)
+            image_ids.append(os.path.splitext(self.path_leaf(img_path))[0])
         classifiers = [""]
-        classifiers.extend(classifier_ids)
+        # this adds in your own classifiers on top of the resnet
+        # classifiers.extend(classifier_ids)
         results = test.classify(self.train_directory+'/prev',image_bytes,logo_names=classifiers,reuse=self.testvar)
         self.testvar = True
+
+        # image context ['sweatshirt', 'wool, woolen, woollen', 'jersey, T-shirt, tee shirt', 'cardigan', 'velvet']
+        data = {}
+        for idx, image_id in enumerate(image_ids):
+
+            for classifier in classifiers:
+                result = {}
+                for node_id in results[classifier][idx]]:
+                    result['classifier'] = classifier
+                    # result[]
+                    [nameMap[node_id-1]
+
+
+                    # print("image context", [nameMap[node_id-1] for node_id in results[classifier][idx]])
+
+                # print("accuracy", float(results[brand][index][1]))
+                # print(bool(round(results[brand][index][1])))
 
         # while(True):
             # indices = [(current_index + i) for i in range(batch_size)]
@@ -210,25 +236,20 @@ class Driver:
 
 
     def start_training(self, classifier_id, image_paths, labels):
-        #
         image_bytes = []            # store the byte data of the training images
         for img_path in image_paths:
             data = tf.gfile.FastGFile(img_path, 'rb').read()
             image_bytes.append(data)
-
-        print("Converting to tfrecord...")
-
-        # print(image_category_index)
         convert.convert_to("../../../resources/tfrecord", image_bytes, labels)
         train.train(
             self.checkpoint_directory,
             self.train_directory,
             "../../../resources/tfrecord",
-            logo_name=classifier_id) #ask bryce to fix logoname
+            logo_name=classifier_id)
         self.swap_out_checkpoints(self.train_directory+'/prev',self.train_directory)
 
 def main():
-    # Driver().get_training_images()
+    Driver().get_training_images()
     Driver().get_classify_images()
     # Driver().start_classify()
     # Driver().start_eval()

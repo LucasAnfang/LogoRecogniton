@@ -912,3 +912,29 @@ exports.update_dataset_and_classifiers = (req, res, next) => {
                     
     }
 }
+
+exports.add_classifier_to_dataset = (req, res, next) => {
+    Dataset.findOneAndUpdate(
+        { "_id": mongoose.Types.ObjectId(datasetId) }, 
+        { $push: {"classifiers": req.body.classifierIds}}, 
+        { safe: true, new: true }
+        )
+        .exec()
+        .then(docs => {
+            if (docs) {
+                res.status(200).json({
+                    message: "Succesfully added classifiers",
+                    doc: docs.classifiers
+                });
+            } else {
+                res.status(404).json({
+                    message: "Couldn't find dataset"
+                })
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err
+            });
+        }); 
+}

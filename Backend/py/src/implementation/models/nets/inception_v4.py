@@ -357,6 +357,11 @@ def inception_v4(inputs, num_classes=1001, is_training=True,
               if logo_name != "":
                   logo_name +="_"
                   # print("logo_name",logo_name)
+                  #
+                  #
+                  # is num classes the thing that's causing the problem?
+                  #
+                  #
                   logits,end_points[logo_name+'AuxLogits'] = add_classifer(logo_name,2,dropout_keep_prob,end_points['Mixed_6h'],net)
                   with tf.variable_scope(logo_name+'Logits'):
                       end_points[logo_name+'Logits'] = logits

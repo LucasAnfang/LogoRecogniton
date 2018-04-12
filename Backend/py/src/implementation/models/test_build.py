@@ -45,27 +45,27 @@ def classify(checkpoints_dir, images, logo_names=[""], reuse=False):
           checkpoints_dir = tf.train.latest_checkpoint(checkpoints_dir)
 
         init_fn = slim.assign_from_checkpoint_fn(
-        checkpoints_dir,
-        slim.get_model_variables('InceptionV4'),
-        ignore_missing_vars=True)
+            checkpoints_dir,
+            slim.get_model_variables('InceptionV4'),
+            ignore_missing_vars=True)
+
         with tf.Session() as sess:
             init_fn(sess)
             output_probabilities  = sess.run([images_list,
                                              processed_image_list]
                                              + probabilities)[2:]
         output_dict = {}
-        print("range(len(output_probabilities): ", range(len(output_probabilities)))
+        # print("range(len(output_probabilities): ", range(len(output_probabilities)))
         for index in range(len(output_probabilities)):
-            print( 'logo_names[index]:[{}]'.format(logo_names[index]))
-            print('type logo_names[index]',type(logo_names[index]));
+            # print( 'logo_names[index]:[{}]'.format(logo_names[index]))
+            # print('type logo_names[index]',type(logo_names[index]));
             if logo_names[index] == "":
-                print("here???????????????????")
                 output_dict [logo_names[index]] = output_probabilities[index]
             else:
                 output_dict [logo_names[index]] = output_probabilities[index]
-            print ("output_dict [""]: ", output_dict [""].shape)
+            # print ("output_dict [""]: ", output_dict[""].shape)
 
-        print ("final 0,780 prob output_dict [""]: ", output_dict[""][0][780]);
+        # print ("final 0,780 prob output_dict [""]: ", output_dict[""][0][780]);
         output_dict[""] = np.argsort(output_dict[""], axis=1)[:, ::-1][:, :5]
         # print ("final output_dict [""]: ", output_dict [""])
         return output_dict
