@@ -89,11 +89,10 @@ var download = function(uri, filename, callback){
 };
 
 exports.fetch_all_datasets = (req, res, next) => {
-    // console.log(req.userData.userId);
     Dataset.find({
         'userId': req.userData.userId
     })
-        .select('_id name')
+        .select('_id name status')
         .exec() //turn it into a real promise
         .then(docs => {
             console.log(docs);
@@ -103,6 +102,7 @@ exports.fetch_all_datasets = (req, res, next) => {
                     return {
                         _id: doc._id,
                         name: doc.name,
+                        status: doc.status,
                         cover: 'http://localhost:2000/' + 'assets/noimages.png',
                         // isProcessed: doc.isProcessed,
                         // uploadRequest: doc.uploadRequest,
@@ -258,6 +258,7 @@ exports.fetch_dataset = (req, res, next) => {
                             res.status(200).json({
                                 datasetId: dataset._id,
                                 datasetName: dataset.name,
+                                datasetStatus: dataset.status,
                                 cover: coverImage,
                                 images: resultsUrls,
                                 classifiers: classifierResults,
