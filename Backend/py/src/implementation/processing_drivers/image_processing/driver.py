@@ -139,15 +139,30 @@ class Driver:
         self.testvar = True
 
         # image context ['sweatshirt', 'wool, woolen, woollen', 'jersey, T-shirt, tee shirt', 'cardigan', 'velvet']
-        data = {}
-        for idx, image_id in enumerate(image_ids):
+        json = {'datasetId': brand,'imageObjs': []}
 
+        for idx, image_id in enumerate(image_ids):
+            img_json = {'imageId': image_id, 'classifier_result': []}
             for classifier in classifiers:
                 result = {}
-                for node_id in results[classifier][idx]]:
-                    result['classifier'] = classifier
+                for node_idx, node_id in enumerate(results[classifier][idx]):
+                    result[node_idx] = nameMap[node_id-1]
+                if (classifier == ""):
+                    img_json.get('classifier_result').append({'classifier_name': "resnet", 'results': result})
+            json.get('imageObjs').append(img_json)
+
+
+        JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
+        headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
+        # res = requests.get(config.routes['Training'], headers=headers)
+        res = requests.post("http://localhost:2000/tensorflow/results", headers=headers, body=json)
+
                     # result[]
-                    [nameMap[node_id-1]
+                    # [nameMap[node_id-1]]
+
+
+
+
 
 
                     # print("image context", [nameMap[node_id-1] for node_id in results[classifier][idx]])

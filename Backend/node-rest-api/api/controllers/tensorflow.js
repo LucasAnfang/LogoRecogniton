@@ -72,7 +72,7 @@ exports.fetch_training_batches_and_set = (req, res, next) => {
     // find all classifiers with status 1, ready to be trained
     // set all classifiers with status 1 to 2, processing
     Classifier.find(
-        { status: 4 }
+        { status: 1 }
     )
     .exec()
     .then(results => {
@@ -95,7 +95,7 @@ exports.fetch_training_batches_and_set = (req, res, next) => {
         results.forEach(item => {
             Classifier.update(
                 {_id: item._id},
-                { $set: {"status": 4 }}, 
+                { $set: {"status": 2 }}, 
                 // { $set: {"status": 1 }}, // for testing purposes
                 { safe: true, multi: true }
             ).exec();
@@ -214,6 +214,18 @@ exports.set_completed_classifier_statuses = (req, res, next) => {
 }
 
 exports.store_results = (req, res, next) => {
-
+    Dataset.findOneAndUpdate(
+        { "_id": mongoose.Types.ObjectId(datasetId) }, 
+        { "status": 6 }, 
+        { safe: true, new: true }
+        )
+        .exec()
+        .then()
+        .catch();
+    
+    for (img in req.body.imageObjs) {
+        
+    }
+    
 }
 
