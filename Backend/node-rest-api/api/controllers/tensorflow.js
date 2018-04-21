@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const Classifier = require('../models/classifier');
 const Dataset = require('../models/dataset');
+const ImageObj = require('../models/image');
+
 const fs = require('fs');
 const path = require('path');
 
@@ -220,11 +222,42 @@ exports.store_results = (req, res, next) => {
         { safe: true, new: true }
         )
         .exec()
-        .then()
+        .then(
+            res.status(200).json({
+                message: 'set dataset status to reflect image object',
+                // createdDataset: {
+                //     _id: result._id,
+                //     name: result.name,
+                //     datasetType: result.datasetType,
+                //     request: {
+                //         type: 'GET',
+                //         url: 'http://localhost:2000/datasets/' + result._id
+                //     }
+                // }
+            })
+        )
         .catch();
-    
+
     for (img in req.body.imageObjs) {
-        
+        var results = [];
+        for(res in img.classifier_result) {
+            results.append({
+                values: res.results,
+                classifier: res.classifier_name
+            })
+        }
+        /*
+            Dataset.findOneAndUpdate(
+        { "_id": mongoose.Types.ObjectId(datasetId) }, 
+        { $push: {"classifiers": req.body.classifierIds}}, 
+        { safe: true, new: true }
+        )
+        */
+        ImageObj.findOneAndUpdate(
+            {"_id": img.imageId},
+            {$push: {"results": results}},
+            {safe: true, new: true}
+        )
     }
     
 }
