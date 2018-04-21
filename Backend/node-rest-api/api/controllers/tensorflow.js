@@ -216,10 +216,30 @@ exports.set_completed_classifier_statuses = (req, res, next) => {
 }
 
 exports.store_results = (req, res, next) => {
+    req.body.imageObjs.forEach(img => {
+        var tempResults = [];
+        img.classifier_result.forEach(imgResult => {
+            tempResults.push({
+                values: imgResult.results,
+                classifier: imgResult.classifier_name
+            });
+        });
+
+        ImageObj.findOneAndUpdate(
+            {"_id": img.imageId},
+            {$push: {"results": tempResults}},
+            {safe: true, new: true}
+        )
+        .exec()
+        .then()
+        .catch();
+
+    });
+
     Dataset.findOneAndUpdate(
-        { "_id": mongoose.Types.ObjectId(datasetId) }, 
-        { "status": 6 }, 
-        { safe: true, new: true }
+            { "_id": mongoose.Types.ObjectId(req.body.datasetId) }, 
+            { "status": 6 }, 
+            { safe: true, new: true }
         )
         .exec()
         .then(
@@ -238,14 +258,17 @@ exports.store_results = (req, res, next) => {
         )
         .catch();
 
-    for (img in req.body.imageObjs) {
-        var results = [];
-        for(res in img.classifier_result) {
-            results.append({
-                values: res.results,
-                classifier: res.classifier_name
-            })
-        }
+    
+        
+        // for(res in img.classifier_result) {
+        //     // console.log(res);
+        //     results.append({
+        //         values: res.results,
+        //         classifier: res.classifier_name
+        //     })
+        // }
+
+        // console.log(results)
         /*
             Dataset.findOneAndUpdate(
         { "_id": mongoose.Types.ObjectId(datasetId) }, 
@@ -253,12 +276,12 @@ exports.store_results = (req, res, next) => {
         { safe: true, new: true }
         )
         */
-        ImageObj.findOneAndUpdate(
-            {"_id": img.imageId},
-            {$push: {"results": results}},
-            {safe: true, new: true}
-        )
-    }
+        // ImageObj.findOneAndUpdate(
+        //     {"_id": img.imageId},
+        //     {$push: {"results": results}},
+        //     {safe: true, new: true}
+        // )
+    // }
     
 }
 
