@@ -939,3 +939,30 @@ exports.add_classifier_to_dataset = (req, res, next) => {
             });
         }); 
 }
+
+exports.get_results = (req, res, next) => {
+    ImageObj.find({"userId": req.userData.userId, "status": req.body.status})
+    .exec()
+    .then(docs => {
+        if (docs.length > 0) {
+            res.status(200).json({
+                images: docs.map(doc => {
+                    return {
+                        classifier: doc.results.classifier,
+                        result: doc.results.map
+                    };
+                })
+            })
+        }
+        else {
+            res.status(400).json({
+                message: "no results"
+            })
+        }
+    })
+    .catch(err => {
+        res.status(200).json({
+            error: err
+        })
+    });
+}
