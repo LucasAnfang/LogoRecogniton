@@ -941,27 +941,37 @@ exports.add_classifier_to_dataset = (req, res, next) => {
 }
 
 exports.get_results = (req, res, next) => {
-    ImageObj.find({"userId": req.userData.userId, "status": req.body.status})
+    Dataset.find({"userId": req.userData.userId, "status": req.params.status})
+    .select("status name images")
+    .populate("images","url results")
     .exec()
     .then(docs => {
         if (docs.length > 0) {
             res.status(200).json({
-                images: docs.map(doc => {
+                datasets: docs.map(doc => {
                     return {
-                        classifier: doc.results.classifier,
-                        result: doc.results.map
+                        name: doc.name,
+                        images: doc.images,
+                        status: doc.status
                     };
                 })
-            })
+                // images: docs.map(doc => {
+                //     return {
+                //         classifier: doc.results.classifier,
+                //         result: doc.results.map
+                //     };
+                // })
+            });
         }
         else {
             res.status(400).json({
                 message: "no results"
-            })
+            });
         }
     })
     .catch(err => {
-        res.status(200).json({
+        console.log(err);
+        res.status(400).json({
             error: err
         })
     });

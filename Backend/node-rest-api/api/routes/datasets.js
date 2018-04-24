@@ -57,4 +57,6 @@ router.get('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, Datas
 router.patch('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.update_category);
 router.delete('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.delete_category);
 
+router.get('/results/:status', checkAuth, DatasetController.get_results);
+
 module.exports = router;

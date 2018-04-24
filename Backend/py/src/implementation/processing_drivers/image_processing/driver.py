@@ -112,6 +112,11 @@ class Driver:
                         image_paths.append(fname)
                 if not image_paths:
                     print("No images in", dataset['_id'], "...skipping...")
+
+                    JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
+                    headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
+                    json = {"datasetId": dataset['_id']}
+                    r = requests.post("http://localhost:2000/tensorflow/results", headers=headers, json=json)
                     # send completion response anyways
                 else:
                     print("classifying", dataset['_id'])
@@ -144,9 +149,12 @@ class Driver:
         for idx, image_id in enumerate(image_ids):
             img_json = {'imageId': image_id, 'classifier_result': []}
             for classifier in classifiers:
-                result = {}
+                result = ''
                 for node_idx, node_id in enumerate(results[classifier][idx]):
-                    result[node_idx] = nameMap[node_id-1]
+                    if (result == ''):
+                        result = nameMap[node_id-1]
+                    else:
+                        result = result + ' ' + nameMap[node_id-1]
                 if (classifier == ""):
                     img_json.get('classifier_result').append({'classifier_name': "resnet", 'results': result})
             json.get('imageObjs').append(img_json)
@@ -154,8 +162,8 @@ class Driver:
 
         JWT = "BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlbnNvcmZsb3dAbG9nb2RldGVjdC5jb20iLCJ1c2VySWQiOiI1YWM0MTE3YTMzZDA5ODJmOGM0ZWEyNjkiLCJpYXQiOjE1MjI3OTg5ODYsImV4cCI6MTU1NDM1NjU4Nn0.y25h7mA6NWUpCq7EeecZ3FuP6IUJpougNVrl695SyAU"
         headers = {"Authorization": JWT, 'Content-Type': 'application/json'}
-        # res = requests.get(config.routes['Training'], headers=headers)
-        res = requests.post("http://localhost:2000/tensorflow/results", headers=headers, body=json)
+        # print(json)
+        res = requests.post("http://localhost:2000/tensorflow/results", headers=headers, json=json)
 
                     # result[]
                     # [nameMap[node_id-1]]
@@ -264,7 +272,7 @@ class Driver:
         self.swap_out_checkpoints(self.train_directory+'/prev',self.train_directory)
 
 def main():
-    Driver().get_training_images()
+    # Driver().get_training_images()
     Driver().get_classify_images()
     # Driver().start_classify()
     # Driver().start_eval()

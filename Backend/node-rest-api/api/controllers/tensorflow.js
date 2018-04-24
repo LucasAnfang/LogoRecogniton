@@ -216,25 +216,28 @@ exports.set_completed_classifier_statuses = (req, res, next) => {
 }
 
 exports.store_results = (req, res, next) => {
-    req.body.imageObjs.forEach(img => {
-        var tempResults = [];
-        img.classifier_result.forEach(imgResult => {
-            tempResults.push({
-                values: imgResult.results,
-                classifier: imgResult.classifier_name
+    console.log(req.body);
+    if (req.body.imageObjs != null) {
+        req.body.imageObjs.forEach(img => {
+            var tempResults = [];
+            img.classifier_result.forEach(imgResult => {
+                tempResults.push({
+                    values: imgResult.results,
+                    classifier: imgResult.classifier_name
+                });
             });
+    
+            ImageObj.findOneAndUpdate(
+                {"_id": img.imageId},
+                {$push: {"results": tempResults}},
+                {safe: true, new: true}
+            )
+            .exec()
+            .then()
+            .catch();
+    
         });
-
-        ImageObj.findOneAndUpdate(
-            {"_id": img.imageId},
-            {$push: {"results": tempResults}},
-            {safe: true, new: true}
-        )
-        .exec()
-        .then()
-        .catch();
-
-    });
+    }
 
     Dataset.findOneAndUpdate(
             { "_id": mongoose.Types.ObjectId(req.body.datasetId) }, 
@@ -242,20 +245,11 @@ exports.store_results = (req, res, next) => {
             { safe: true, new: true }
         )
         .exec()
-        .then(
+        .then(docs => {
             res.status(200).json({
-                message: 'set dataset status to reflect image object',
-                // createdDataset: {
-                //     _id: result._id,
-                //     name: result.name,
-                //     datasetType: result.datasetType,
-                //     request: {
-                //         type: 'GET',
-                //         url: 'http://localhost:2000/datasets/' + result._id
-                //     }
-                // }
-            })
-        )
+                message: 'set dataset status to reflect image object'
+            });
+        })
         .catch();
 
     
