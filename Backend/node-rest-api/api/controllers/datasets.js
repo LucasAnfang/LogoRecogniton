@@ -232,47 +232,45 @@ exports.fetch_dataset = (req, res, next) => {
                 const folder = 'datasets/' + req.params.datasetId + '/'; //+ req.params.datasetId + '/';
                 traverseDirectory(folder, function(err, result) {
                     // console.log("traverseDirectory result is: " + result);
-                    if (err) {
-                        console.log(err);
-                        res.status(300).json({message: 'Dataset is empty'})
-                    }
-                    else {
-                        Promise.all([
-                            ImageObj.find({ "parentDatasetId": id }),
-                            Classifier.find({ "parentDatasetId": id }).select("name _id")
-                        ])
-                        .then(([imageResults, classifierResults]) => {
-                            resultsUrls = [];
-                            for(var img of imageResults) {
-                                resultsUrls.push(img.url);                        
-                            }
+                    Promise.all([
+                        ImageObj.find({ "parentDatasetId": id }),
+                        Classifier.find({ "parentDatasetId": id }).select("name _id")
+                    ])
+                    .then(([imageResults, classifierResults]) => {
+                        resultsUrls = [];
+                        for(var img of imageResults) {
+                            resultsUrls.push(img.url);                        
+                        }
+
+                        if (err) {
+                            console.log(err);
+                        } else {
                             for (var r of result) {
                                 resultsUrls.push('http://localhost:2000/' + r);                        
                             }
-                            if (resultsUrls.length != 0) {
-                                coverImage = resultsUrls[0];
-                            } else {
-                                coverImage = 'http://localhost:2000/' + 'assets/noimages.png';
+                        }
+
+                        if (resultsUrls.length != 0) {
+                            coverImage = resultsUrls[0];
+                        }
+
+                        console.log(classifierResults);
+                        res.status(200).json({
+                            datasetId: dataset._id,
+                            datasetName: dataset.name,
+                            datasetStatus: dataset.status,
+                            cover: coverImage,
+                            images: resultsUrls,
+                            classifiers: classifierResults,
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:2000/datasets/' + dataset._id
                             }
-                            console.log(classifierResults);
-                            res.status(200).json({
-                                datasetId: dataset._id,
-                                datasetName: dataset.name,
-                                datasetStatus: dataset.status,
-                                cover: coverImage,
-                                images: resultsUrls,
-                                classifiers: classifierResults,
-                                request: {
-                                    type: 'GET',
-                                    url: 'http://localhost:2000/datasets/' + dataset._id
-                                }
-                            });
-                        })
-                        .catch((err) => {
-                            console.log('Error: ', err);
                         });
-                        
-                    }
+                    })
+                    .catch((err) => {
+                        console.log('Error: ', err);
+                    });
                 });
             }
         })
