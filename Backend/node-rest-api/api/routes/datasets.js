@@ -57,6 +57,8 @@ router.get('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, Datas
 router.patch('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.update_category);
 router.delete('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, DatasetController.delete_category);
 
-router.get('/results/:status', checkAuth, DatasetController.get_results);
+router.get('/results', checkAuth, DatasetController.get_all_results);
+router.post('/results/status/', checkAuth, DatasetController.get_status_results);
+// router.get('/results/dataset/:datasetId', checkAuth, DatasetController.get_status_results);
 
 module.exports = router;
