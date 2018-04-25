@@ -89,6 +89,8 @@ var download = function(uri, filename, callback){
 };
 
 exports.fetch_all_datasets = (req, res, next) => {
+    var coverImg = 'http://localhost:2000/' + 'assets/noimages.png';
+
     Dataset.find({
         'userId': req.userData.userId
     })
@@ -103,7 +105,7 @@ exports.fetch_all_datasets = (req, res, next) => {
                         _id: doc._id,
                         name: doc.name,
                         status: doc.status,
-                        cover: 'http://localhost:2000/' + 'assets/noimages.png',
+                        cover: coverImg,
                         // isProcessed: doc.isProcessed,
                         // uploadRequest: doc.uploadRequest,
                         // completionTimestamp: doc.completionTimestamp,
@@ -336,7 +338,7 @@ exports.upload_images = (req, res, next) => {
     imageIds = [];
     imageUrls = [];
     for(var image in req.body.images){
-        console.log(image+": "+req.body.images[image]);
+        // console.log(image+": "+req.body.images[image]);
         const imageObj = new ImageObj({
             _id: new mongoose.Types.ObjectId(),
             userId: req.userData.userId,
@@ -360,52 +362,88 @@ exports.upload_images = (req, res, next) => {
             error: "Dataset ID is not a valid ID"
         });
     } else {
-        Dataset.findOneAndUpdate(
+        const folder = 'datasets/' + req.params.datasetId + '/'; //+ req.params.datasetId + '/';
+
+        var datasetPromise = Dataset.findOneAndUpdate(
             {
                 "_id": mongoose.Types.ObjectId(datasetId),
                 "userId": mongoose.Types.ObjectId(req.userData.userId)
             },
             { $pushAll: { "images": imageIds } },
-            {upsert:true, safe:true, new:true}
-        )
-        .exec()
-        .then(dataset => {
-            const folder = 'datasets/' + req.params.datasetId + '/';
-            traverseDirectory(folder, function(err, result) {
-                console.log("traverseDirectory result is: " + result);
+            { upsert:true, safe:true, new:true }
+        );
+        var imagePromise = ImageObj.find({"parentDatasetId": datasetId });
+        traverseDirectory(folder, function(err, result) {
+            Promise.all([
+                datasetPromise,
+                imagePromise
+            ])
+            .then(([datasetResult, imageResult]) => {
                 
-                ImageObj.find({"parentDatasetId": datasetId })
-                .exec()
-                .then(imgs => {
-                    resultsUrls = [];
-                    for(var img of imgs) {
-                        resultsUrls.push(img.url);                        
+                resultsUrls = [];
+                for(var img of imageResult) {
+                    resultsUrls.push(img.url);                        
+                }
+                if (!err) {    
+                    for (var r of traverseResult.result) {
+                        resultsUrls.push('http://localhost:2000/' + r);
                     }
-                    if (!err) {    
-                        for (var r of result) {
-                            resultsUrls.push('http://localhost:2000/' + r);
-                        }
-                    }
-                    res.status(200).json({
-                        message: "updated images",
-                        images: resultsUrls
-                    });
+                }
+                res.status(200).json({
+                    
+                    message: "updated dataset " + datasetResult._id,
+                    images: resultsUrls
                 });
-
-            });
-        })
-        .catch(err => {
-            res.status(500).json({
-                err: err
+    
+    
             });
         });
+
+        
+        // Dataset.findOneAndUpdate(
+        //     {
+        //         "_id": mongoose.Types.ObjectId(datasetId),
+        //         "userId": mongoose.Types.ObjectId(req.userData.userId)
+        //     },
+        //     { $pushAll: { "images": imageIds } },
+        //     { upsert:true, safe:true, new:true }
+        // )
+        // .exec()
+        // .then(dataset => {
+        //     const folder = 'datasets/' + req.params.datasetId + '/';
+        //     traverseDirectory(folder, (err, result) => {
+        //         ImageObj.find({"parentDatasetId": datasetId })
+        //         .exec()
+        //         .then(imgs => {
+        //             resultsUrls = [];
+        //             for(var img of imgs) {
+        //                 resultsUrls.push(img.url);                        
+        //             }
+        //             if (!err) {    
+        //                 for (var r of result) {
+        //                     resultsUrls.push('http://localhost:2000/' + r);
+        //                 }
+        //             }
+        //             res.status(200).json({
+        //                 message: "updated images",
+        //                 images: resultsUrls
+        //             });
+        //         });
+
+        //     });
+        // })
+        // .catch(err => {
+        //     res.status(500).json({
+        //         err: err
+        //     });
+        // });
     }
-    Dataset.findById(datasetId)
-    .populate('images')
-    .exec()
-    .then(result => {
-        // console.log(result);
-    })
+    // Dataset.findById(datasetId)
+    // .populate('images')
+    // .exec()
+    // .then(result => {
+    //     // console.log(result);
+    // })
     
 }
 
