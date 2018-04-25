@@ -249,7 +249,6 @@ exports.fetch_dataset = (req, res, next) => {
                                 resultsUrls.push('http://localhost:2000/' + r);                        
                             }
                         }
-
                         if (resultsUrls.length != 0) {
                             coverImage = resultsUrls[0];
                         }
@@ -381,9 +380,6 @@ exports.upload_images = (req, res, next) => {
                     resultsUrls = [];
                     for(var img of imgs) {
                         resultsUrls.push(img.url);                        
-                    }
-                    for (var i of imageUrls) {
-                        resultsUrls.push(i);
                     }
                     if (!err) {    
                         for (var r of result) {
@@ -1028,11 +1024,20 @@ exports.get_status_results_url = (req, res, next) => {
                         name: doc.name,
                         images: doc.images.map(img => {
                             return {
+                                imageId: img._id,
                                 url: img.url,
                                 results: img.results
-                                    // .map(result => {
-                                        
+                                    // resultBody => {
+                                    //     return {
+                                    //         classifier: resultBody.classifier,
+                                    //         values: resultBody.values
+                                    //     };
                                     // })
+                                    // return {
+                                    //     classifier: result.classifier,
+                                    //     values: result.values
+                                    // };
+                                // })
                             };
                         }),
                         status: doc.status
