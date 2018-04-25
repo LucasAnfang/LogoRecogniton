@@ -941,7 +941,43 @@ exports.add_classifier_to_dataset = (req, res, next) => {
 }
 
 exports.get_all_results = (req, res, next) => {
-    Dataset.find({"userId": req.userData.userId})
+    Dataset.find({
+        "userId": req.userData.userId
+    })
+    .select("status name images")
+    .populate("images","url results")
+    .exec()
+    .then(docs => {
+        if (docs.length > 0) {
+            res.status(200).json({
+                datasets: docs.map(doc => {
+                    return {
+                        name: doc.name,
+                        images: doc.images,
+                        status: doc.status
+                    };
+                })
+            });
+        }
+        else {
+            res.status(400).json({
+                message: "no results"
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(400).json({
+            error: err
+        })
+    });
+}
+
+exports.get_status_results = (req, res, next) => {
+    Dataset.find({
+        "userId": req.userData.userId,
+        "status": { $in: req.body.status }
+    })
     .select("status name images")
     .populate("images","url results")
     .exec()
@@ -977,9 +1013,12 @@ exports.get_all_results = (req, res, next) => {
     });
 }
 
-exports.get_status_results = (req, res, next) => {
-    Dataset.find({"userId": req.userData.userId, "status": req.params.status})
-    .select("status name images")
+exports.get_status_results_url = (req, res, next) => {
+    Dataset.find({
+        "userId": req.userData.userId,
+        "status": req.params.status
+    })
+    .select("_id status name images")
     .populate("images","url results")
     .exec()
     .then(docs => {
@@ -987,8 +1026,17 @@ exports.get_status_results = (req, res, next) => {
             res.status(200).json({
                 datasets: docs.map(doc => {
                     return {
+                        datasetId: doc._id,
                         name: doc.name,
-                        images: doc.images,
+                        images: doc.images.map(img => {
+                            return {
+                                url: img.url,
+                                results: img.results
+                                    // .map(result => {
+                                        
+                                    // })
+                            };
+                        }),
                         status: doc.status
                     };
                 })

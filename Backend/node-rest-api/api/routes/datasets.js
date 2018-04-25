@@ -59,6 +59,7 @@ router.delete('/:datasetId/classifiers/:classifierId/:categoryId', checkAuth, Da
 
 router.get('/results', checkAuth, DatasetController.get_all_results);
 router.post('/results/status/', checkAuth, DatasetController.get_status_results);
+router.get('/results/:status', checkAuth, DatasetController.get_status_results_url);
 // router.get('/results/dataset/:datasetId', checkAuth, DatasetController.get_status_results);
 
 module.exports = router;
