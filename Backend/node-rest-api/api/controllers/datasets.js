@@ -380,8 +380,8 @@ exports.upload_images = (req, res, next) => {
             ])
             .then(([datasetResult, imageResult]) => {
                 resultsUrls = [];
-                for(var img of imageResult) {
-                    resultsUrls.push(img.url);                        
+                for(var img of imageUrls) {
+                    resultsUrls.push(img);                        
                 }
                 if (!err) {    
                     for (var r of result) {
@@ -390,7 +390,7 @@ exports.upload_images = (req, res, next) => {
                 }
                 res.status(200).json({
                     message: "updated dataset " + datasetResult._id,
-                    images: imageUrls
+                    images: resultsUrls
                 });
             });
         });
