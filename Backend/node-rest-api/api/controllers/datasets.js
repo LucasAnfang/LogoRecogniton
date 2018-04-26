@@ -373,7 +373,7 @@ exports.upload_images = (req, res, next) => {
             { upsert:true, safe:true, new:true }
         );
         var imagePromise = ImageObj.find({"parentDatasetId": datasetId });
-        traverseDirectory(folder, function(err, result) {
+        // traverseDirectory(folder, function(err, result) {
             Promise.all([
                 datasetPromise,
                 imagePromise
@@ -383,17 +383,17 @@ exports.upload_images = (req, res, next) => {
                 for(var img of imageUrls) {
                     resultsUrls.push(img);                        
                 }
-                if (!err) {    
-                    for (var r of result) {
-                        resultsUrls.push('http://localhost:2000/' + r);
-                    }
-                }
+                // if (!err) {    
+                    // for (var r of result) {
+                    //     resultsUrls.push('http://localhost:2000/' + r);
+                    // }
+                // }
                 res.status(200).json({
                     message: "updated dataset " + datasetResult._id,
                     images: resultsUrls
                 });
             });
-        });
+        // });
 
         
         // Dataset.findOneAndUpdate(
