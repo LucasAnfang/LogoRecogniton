@@ -390,7 +390,7 @@ exports.upload_images = (req, res, next) => {
                 }
                 res.status(200).json({
                     message: "updated dataset " + datasetResult._id,
-                    images: resultsUrls
+                    images: imageUrls
                 });
             });
         });
