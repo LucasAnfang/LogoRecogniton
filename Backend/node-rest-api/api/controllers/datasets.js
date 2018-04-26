@@ -379,23 +379,19 @@ exports.upload_images = (req, res, next) => {
                 imagePromise
             ])
             .then(([datasetResult, imageResult]) => {
-                
                 resultsUrls = [];
                 for(var img of imageResult) {
                     resultsUrls.push(img.url);                        
                 }
                 if (!err) {    
-                    for (var r of traverseResult.result) {
+                    for (var r of result) {
                         resultsUrls.push('http://localhost:2000/' + r);
                     }
                 }
                 res.status(200).json({
-                    
                     message: "updated dataset " + datasetResult._id,
                     images: resultsUrls
                 });
-    
-    
             });
         });
 

@@ -229,10 +229,7 @@ exports.store_results = (req, res, next) => {
     
             ImageObj.findOneAndUpdate(
                 {"_id": img.imageId},
-                {$push: {"results": tempResults.map(results => {
-                    value: results.results,
-                    classifier.classifier_name
-                })}},
+                {$push: {"results": tempResults}},
                 {safe: true, new: true}
             )
             .exec()
